@@ -1,0 +1,17 @@
+ERRORES QUE NOS SALTEN:
+
+-PROBLEMAS CON LIBRERIAS?
+si ya lo instalaste en tu entorno de anaconda
+anda a vs code apreta F1 y escribi:
+Python: select interpreter
+y eleguis tu entorno
+
+-NO TE ENCUENTRA EL ARCHIVO DE PACIENTES O ECG?
+hace un archivo nuevo y corre esto:
+import os
+
+print(os.getcwd())  # Muestra el directorio actual
+print(os.listdir())  # Lista los archivos disponibles
+
+sino te aparece ahi es que no esta puesto en la carpeta correcta
+y te aparece en que carpeta estas trabajando
