@@ -4,6 +4,11 @@ LIBRERIAS:
 import numpy as np
 import matplotlib.pyplot as plt
 
+MANEJO DE ERRORES: TRY EXCEPT 
+es una estructura que permite intentar ejecutar 
+código (try) y capturar errores si ocurren (except), 
+evitando que el programa se rompa.
+
 INSTRUCCIONES:
 manejar errores con formato q queramos
 GENERAR: REPORTE datos+valores+clasificación
