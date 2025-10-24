@@ -39,6 +39,18 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         pacientes_completos[i]["RGC"].append(rgc)
     
     return pacientes_completos #AGREGA los CALCULOS A LA LISTA DE PACIENTES
+    #PUNTO 2: Analisis de ECG
+def analizar_ecg (): #funcion que lee el archivo
+    with open ("ecg_id_pacient.csv", encoding="utf-8") as archivo:
+        datos=[float(linea.strip()) for linea in archivo] #leer datos del archivo, linea.strip() elimina los caracteres (espacios en blanco por defecto)
+#calcule y retorne valor maximo y minimo de señal
+        valor_max = max(datos)
+        valor_min= min(datos)
+#calcule y retorne el promedio de la señal
+        promedio = sum(datos)/len(datos) #uso funciones integradas
+    return valor_max, valor_min, promedio
+#PUNTO 3: Clasificacion y triage
+def triage_paciente ()
 
 with open ("pacientes_final.csv","r", encoding="utf-8") as archivo:
   reader=csv.DictReader(archivo)
@@ -59,17 +71,5 @@ with open ("pacientes_final.csv","r", encoding="utf-8") as archivo:
             PULSOXIMETRO_ROJA = row["PULSOXIMETRO IR"]
             PULSOXIMETRO_INFRAROJA = row["PULSOXIMETRO R"]
 
-#PUNTO 2: Analisis de ECG
-def analizar_ecg (): #funcion que lee el archivo
-    with open ("ecg_id_pacient.csv", encoding="utf-8") as archivo:
-        datos=[float(linea.strip()) for linea in archivo] #leer datos del archivo, linea.strip() elimina los caracteres (espacios en blanco por defecto)
-#calcule y retorne valor maximo y minimo de señal
-        valor_max = max(datos)
-        valor_min= min(datos)
-#calcule y retorne el promedio de la señal
-        promedio = sum(datos)/len(datos) #uso funciones integradas
-    return valor_max, valor_min, promedio
-#PUNTO 3: Clasificacion y triage
-def triage_paciente ()
 
   
