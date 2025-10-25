@@ -1,4 +1,5 @@
-def calcular_valores(paciente): #calcula el imc y etc y le das el dic del paciente
+def calcular_valores(paciente): #calcula el imc y etc y le das el dic del paciente 
+  #separsr en varias funciones para buenas prácticas
   return paciente_completo #AGREGAs los CALCULOS AL ID PACIENTE
 
 def leer_ecg(): #interrpreta los datos del electrocardiograma
