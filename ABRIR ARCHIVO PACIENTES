@@ -1,18 +1,19 @@
 import csv
+
 #escribo los nombres de mis csv aca arriba por si quiero cambiar el archivo que le doy o el nombre del nuevo
 entrada = "pacientes_final.csv"
 salida = "pacientes_2025.csv"
 
+#keys de las columnas q necesito
 keysdeclinicas = [
     "ID", "NOMBRE", "EDAD", "PESO",
     "ALTURA", "SISTOLICA", "DIASTOLICA",
     "TEMPERATURA", "F_CARD", "N_OXIGENO", 
-    "GLUCOSA", "COLESTEROL","PULSOXIMETRO_ROJA", "PULSOXIMETRO_INFRAROJA",
-    "IMC", "PAM", "SpO2", "RGC", "CLASIFICACION"
+    "GLUCOSA", "COLESTEROL","PULSOXIMETRO_R", "PULSOXIMETRO_IR",
+    "IMC", "PAM", "SPO2", "RGC", "CLASIFICACION"
 ]
 
 pacientes = [] #guardo los pecientes en una lista
-
 
 #abro el archivo para leerlo y guardar lo necesario
 with open(entrada, "r", encoding="utf-8-sig", newline="") as p:
@@ -41,8 +42,16 @@ with open(entrada, "r", encoding="utf-8-sig", newline="") as p:
                      "CLASIFICACION": None
                      }
         pacientes.append(paciente)
-#escribo y corrijo errores
-with open(salida, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
-    writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
-    writer.writeheader()
-    writer.writerows(pacientes)
+
+#escribo 
+try:
+    #y corrijo errores en el ingreso de archivos (pending....)
+    with open(salida, "x", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
+        writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
+        writer.writeheader()
+        writer.writerows(pacientes)
+except FileExistsError: #que hacer cuando me tire error (pending...)
+    with open("pacientes_nuevo.csv", "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
+        writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
+        writer.writeheader()
+        writer.writerows(pacientes)
