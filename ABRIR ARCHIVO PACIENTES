@@ -46,6 +46,7 @@ with open(entrada, "r", encoding="utf-8-sig", newline="") as p:
 #escribo 
 try:
     #y corrijo errores en el ingreso de archivos (pending....)
+#si hay algo raro lo reescribo como 0
     with open(salida, "x", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
         writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
         writer.writeheader()
