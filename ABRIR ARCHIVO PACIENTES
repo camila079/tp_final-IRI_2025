@@ -1,0 +1,48 @@
+import csv
+#escribo los nombres de mis csv aca arriba por si quiero cambiar el archivo que le doy o el nombre del nuevo
+entrada = "pacientes_final.csv"
+salida = "pacientes_2025.csv"
+
+keysdeclinicas = [
+    "ID", "NOMBRE", "EDAD", "PESO",
+    "ALTURA", "SISTOLICA", "DIASTOLICA",
+    "TEMPERATURA", "F_CARD", "N_OXIGENO", 
+    "GLUCOSA", "COLESTEROL","PULSOXIMETRO_ROJA", "PULSOXIMETRO_INFRAROJA",
+    "IMC", "PAM", "SpO2", "RGC", "CLASIFICACION"
+]
+
+pacientes = [] #guardo los pecientes en una lista
+
+
+#abro el archivo para leerlo y guardar lo necesario
+with open(entrada, "r", encoding="utf-8-sig", newline="") as p:
+    reader = csv.DictReader(p)
+
+    for fila in reader:
+        id_paciente = fila["paciente_id"]
+        paciente = {"ID": id_paciente,
+                     "NOMBRE": fila["nombre_paciente"].upper(),
+                     "EDAD": fila["edad"],
+                     "PESO": fila["peso_kg"],
+                     "ALTURA": fila["altura_m"],
+                     "SISTOLICA": fila["sistolica_mmHg"],
+                     "DIASTOLICA": fila["diastolica_mmHg"],
+                     "TEMPERATURA": fila["temperatura_C"],
+                     "F_CARD": fila["frecuencia_cardiaca_lpm"],
+                     "N_OXIGENO": fila["nivel_oxigeno_perc"],
+                     "GLUCOSA": fila["glucosa_mg_dL"],
+                     "COLESTEROL": fila["colesterol_mg_dL"],
+                     "PULSOXIMETRO_R": fila["pulsoximetro_r_perc"],
+                     "PULSOXIMETRO_IR": fila["pulsoximetro_ir_perc"],
+                     "IMC": None, 
+                     "PAM": None, 
+                     "SPO2": None, 
+                     "RGC": None,
+                     "CLASIFICACION": None
+                     }
+        pacientes.append(paciente)
+#escribo y corrijo errores
+with open(salida, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
+    writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
+    writer.writeheader()
+    writer.writerows(pacientes)
