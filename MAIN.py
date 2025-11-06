@@ -185,46 +185,75 @@ def ecg(entrada_s):
 
 
 ######
-def buscar_paciente(paciente_id):
-    paciente = 0
-    paciente_id = str(paciente_id).strip().upper()
+def ecg(entrada_s):
+    datos = []
+    max_señales = []
+    min_señales = []
+    prom_señales = []
     try:
-        with open(salida_p, "r", "utf-8-sig") as p:
-            reader = csv.DictReader(p)
+        with open(entrada_s, "r", encoding="utf-8-sig") as archivo:
+            reader = csv.reader(archivo)
+            header = next(reader)
+            indice = header.index('ecg_file')
+            
+            for linea in reader:
+                datos.append(linea[indice])
+                #encontro datos y los guardo
+
+        for dato in datos:
+            ruta = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", dato)
+            señales = abrir_archivos(ruta)
+            max_señales.append({"archivo": dato, "max": float(señales.max())})
+            min_señales.append({"archivo": dato, "min": float(señales.min())})
+            prom_señales.append({"archivo": dato, "promedio": sum(datos)/len(datos)})
+            #uso funciones integradas
+            #ahora tengo un diccionario con los valores maximos y minimos relacionado al key de archivo 
+        return max_señales, min_señales, prom_señales
+
+    except Exception as e: #no se pudo abrir el archivo ya esta
+        print(f"Error en la lectura de archivos ECG: {e}")
+        return None, None
+
+def buscar_paciente(id):
+    id_limpio = id.strip().upper()
+    if not id_limpio.startswith("P"):
+        id_limpio = "P" + id_limpio
+
+    try:
+        with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+            reader = csv.DictReader(archivo)
             for fila in reader:
-                    id_actual = fila.get("ID", "").strip().upper()
-
-                    if str(paciente_id).upper() == id_actual:
-                        paciente = {
-                            "ID": id_actual,
-                            "NOMBRE": fila["NOMBRE"].upper(),
-                            "EDAD": fila["EDAD"],
-                            "PESO": fila["PESO"],
-                            "ALTURA": fila["ALTURA"],
-                            "SISTOLICA": fila["SISTOLICA"],
-                            "DIASTOLICA": fila["DIASTOLICA"],
-                            "TEMPERATURA": fila["TEMPERATURA"],
-                            "F_CARD": fila["F_CARD"],
-                            "N_OXIGENO": fila["N_OXIGENO"],
-                            "GLUCOSA": fila["GLUCOSA"],
-                            "COLESTEROL": fila["COLESTEROL"],
-                            "PULSOXIMETRO_R": fila["PULSOXIMETRO_R"],
-                            "PULSOXIMETRO_IR": fila["PULSOXIMETRO_IR"],
-                            "IMC": float(fila.get("IMC", 0.0)),
-                            "PAM": float(fila.get("PAM", 0)),
-                            "SPO2": float(fila.get("SPO2", 0)),
-                            "RGC": float(fila.get("RGC", 0)),
-                            "CLASIFICACION": fila.get("CLASIFICACION", "0")
-                        }
-                        return paciente
-            return None  
-
+                if id_limpio == fila.get("ID", "").strip().upper():
+                    return {
+                        "ID": id_limpio,
+                        "NOMBRE": fila.get("NOMBRE", "").upper(),
+                        "EDAD": fila.get("EDAD", ""),
+                        "PESO": fila.get("PESO", ""),
+                        "ALTURA": fila.get("ALTURA", ""),
+                        "SISTOLICA": fila.get("SISTOLICA", ""),
+                        "DIASTOLICA": fila.get("DIASTOLICA", ""),
+                        "TEMPERATURA": fila.get("TEMPERATURA", ""),
+                        "F_CARD": fila.get("F_CARD", ""),
+                        "N_OXIGENO": fila.get("N_OXIGENO", ""),
+                        "GLUCOSA": fila.get("GLUCOSA", ""),
+                        "COLESTEROL": fila.get("COLESTEROL", ""),
+                        "PULSOXIMETRO_R": fila.get("PULSOXIMETRO_R", ""),
+                        "PULSOXIMETRO_IR": fila.get("PULSOXIMETRO_IR", ""),
+                        "IMC": float(fila.get("IMC", 0.0)),
+                        "PAM": float(fila.get("PAM", 0.0)),
+                        "SPO2": float(fila.get("SPO2", 0.0)),
+                        "RGC": float(fila.get("RGC", 0.0)),
+                        "CLASIFICACION": fila.get("CLASIFICACION", "0")
+                    }
     except Exception as e:
-        print(f"Error al leer el archivo CSV: {e}")
-        return None
+        print(f"Error al buscar paciente: {e}")
+
+    return None  # Si no se encuentra el paciente
 #PUNTO 3: Clasificacion y triage
-def triage_paciente (p):
+def triage_paciente (id):
+    p = buscar_paciente(id)
     # Evitar múltiples llamados con .get()
+
     fc = p.get("frecuencia_cardiaca", None)
     pam = p.get("presion_arterial", None)
     temp = p.get("temperatura", None)
@@ -255,6 +284,5 @@ def triage_paciente (p):
             return color
 
     return "Azul"
-
 #PUNTO 4: Reporte y Visualizacion
   
