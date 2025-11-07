@@ -19,3 +19,27 @@ etiqueta.pack()
 
 # Ejecutar la ventana
 ventana.mainloop()
+#------------------------
+#Funciones para debuggear
+def eliminar_paciente(id, entrada_p):
+    filas_filtradas = []
+    pacientes_eliminados = []
+
+    # Leer archivo y filtrar
+    with open(entrada_p, "r", encoding="utf-8-sig") as archivo:
+        reader = csv.DictReader(archivo)
+        fieldnames = reader.fieldnames
+
+        for fila in reader:
+            if fila["ID"] != id:
+                filas_filtradas.append(fila)
+            else:
+                pacientes_eliminados.append(fila)
+
+    # Reescribir archivo con las filas filtradas
+    with open(salida_p, "w", encoding="utf-8-sig", newline="") as archivo:
+        writer = csv.DictWriter(archivo, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(filas_filtradas)
+
+    return filas_filtradas
