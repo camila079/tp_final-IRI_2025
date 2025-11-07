@@ -21,12 +21,12 @@ etiqueta.pack()
 ventana.mainloop()
 #------------------------
 #Funciones para debuggear
-def eliminar_paciente(id, entrada_p):
+def eliminar_paciente(id, ruta):#cambie el archivo por ruta
     filas_filtradas = []
     pacientes_eliminados = []
 
     # Leer archivo y filtrar
-    with open(entrada_p, "r", encoding="utf-8-sig") as archivo:
+    with open(ruta, "r", encoding="utf-8-sig") as archivo:#cambie el archivo por ruta
         reader = csv.DictReader(archivo)
         fieldnames = reader.fieldnames
 
@@ -37,7 +37,7 @@ def eliminar_paciente(id, entrada_p):
                 pacientes_eliminados.append(fila)
 
     # Reescribir archivo con las filas filtradas
-    with open(salida_p, "w", encoding="utf-8-sig", newline="") as archivo:
+    with open(ruta, "w", encoding="utf-8-sig", newline="") as archivo: #cambie el archivo por ruta
         writer = csv.DictWriter(archivo, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(filas_filtradas)
