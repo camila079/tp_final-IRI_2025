@@ -105,6 +105,12 @@ def graficar_lineas_senyales(ruta, entrada_sen):
 
 def graficas_barras_estado(ruta):           
     pacientes, imc, pam, clasificacion = eu.archivos_aux(ruta)
+    cant_azul = 0
+    cant_verde = 0
+    cant_amarillo = 0
+    cant_naranja = 0 
+    cant_rojo = 0
+    cant_negro = 0
     for paciente in pacientes:
         if(paciente["clasificacion"] == "Azul"):
             cant_azul += 1 
@@ -117,13 +123,20 @@ def graficas_barras_estado(ruta):
         elif(paciente["clasificacion"] == "Rojo"):
             cant_rojo += 1
         elif(paciente["clasificacion"] == "Negro"):
-            cant_negro += 1
+            cant_negro += 1        
             
+    fig, ax = plt.subplots()
     x = np.array(["Estado: Azul", "Estado: Verde", "Estado: Amarillo", "Estado: Naranja", "Estado: Rojo", "Estado: Negro"])
-    y = np.array([cant_azul, cant_verde, 1, 10])
-
-plt.bar(x,y)
-plt.show()
+    y = np.array([cant_azul, cant_verde, cant_amarillo, cant_naranja, cant_rojo, cant_negro])
+    bar_colors = ['tab:blue', 'tab:green', 'yellow', 'tab:orange', 'tab:red', 'black']
+    # Crear barras
+    ax.bar(x, y, color=bar_colors, width=0.6)
+    ax.set_ylabel('Cantidad de pacientes')
+    ax.set_title('Pacientes por estado actual')
+    plt.xticks(fontsize=10, rotation=20) 
+    plt.show()
+    
+    return
 
 def grafico_dispersion():
     try:
