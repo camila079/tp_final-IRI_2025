@@ -221,7 +221,7 @@ def archivos_aux(ruta):
             id_actual = row["ID"]
             imc_val = float(row["IMC"])
             pam_val = float(row["PAM"])
-            clase = triage_paciente(id_actual)
+            clase = triage_paciente(row)
 
             pacientes.append({
                 "id_paciente": id_actual,
