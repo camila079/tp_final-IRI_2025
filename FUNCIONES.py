@@ -432,55 +432,114 @@ def triage_paciente (id):
     return "Azul"
 
 #PUNTO 4: Reporte y Visualizacion
-#FUNCION EXTRA
-def pacientes_criticos():
+#PUNTO 4: Reporte y Visualizacion 
+def reporte_general(salida_p):
+        try:
+            with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+                reader = csv.DictReader(archivo)
+                print("\n---REPORTE DE PACIENTES---")
+                print("-"*80)
+                print("ID  |NOMBRE  |EDAD  |IMC  |PAM  |SPO2  |RGC  |TRIAGE  ")
+                print("-"*80)
+
+                for fila in reader:
+                    #saco los datos del diccionario
+                    nombre = fila.get("NOMBRE", "")
+                    edad = fila.get("EDAD", "")
+                    peso = fila.get("PESO", "")
+                    altura = fila.get("ALTURA", "")
+                    sist = fila.get("SISTOLICA", "")
+                    diast = fila.get("DIASTOLICA", "")
+                    temp = fila.get("TEMPERATURA", "")
+                    oxi = fila.get("N_OXIGENO", "")
+                    gluc = fila.get("GLUCOSA", "")
+                    col = fila.get("COLESTEROL", "")
+                    fcard = fila.get("F_CARD", "")
+                    pr = fila.get("PULSOXIMETRO_R", "")
+                    pir = fila.get("PULSOXIMETRO_IR", "")
+                    try:
+                        peso = float(peso)
+                        altura = float(altura)
+                        sist = float(sist)
+                        diast = float(diast)
+                        pr = float(pr)
+                        pir = float(pir)
+                        gluc = float(gluc)
+                        col = float(col)
+                        oxi = float(oxi)
+                        temp = float(temp)
+                    except:
+                        continue
+                    imc = calcular_imc(peso, altura)
+                    pam = calcular_pres_am(diast, sist)
+                    spo2 = calcular_porcentaje_R_IR(pr, pir)
+                    rgc = calcular_relacion_gc(gluc, col)
+                    #diccionario con valores para el triage
+                    p = {"F_CARD" : fcard, "PAM" : pam, "TEMPERATURA" : temp, "N_OXIGENO" : oxi, 
+                        "IMC" : imc, "GLUCOSA" : gluc, "COLESTEROL" : col}
+                    color = triage_paciente(p)
+
+                    print("Nombre:", nombre)
+                    print("Edad:", edad)
+                    print("IMC:", imc)
+                    print("PAM:", pam)
+                    print("Saturación O2:", spo2)
+                    print("Relación Glucosa/Colesterol:", rgc)
+                    print("Color del triage:", color)
+                    print("-" * 80)
+        except Exception as e:
+            print(f"Error al generar el reporte: {e}")
+            return None
+
+#FUNCIONES EXTRAS
+def pacientes_criticos(salida_p):
     try:
         with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
             reader = csv.DictReader(archivo) #crea un objeto que toma la primera fila del archivo CSV como los nombres de las columnas
             criticos = []
 
             for fila in reader:
-                id_p = fila.get("ID", "").strip().upper()
-                color = triage_paciente(id_p)
+                color = triage_paciente(fila)
                 if color == "Rojo":
                     criticos.append(fila)
 
             if not criticos:
                 print("No hay pacientes en estado crítico (Rojo).")
                 return
-
-            print("\n---PACIENTES EN ESTADO CRÍTICO---")
-            for p in criticos:
-                print(f"\nID: {p['ID']}")
-                print(f"Nombre: {p['NOMBRE']}")
-                print(f"Edad: {p['EDAD']} años")
-                print(f"Temperatura: {p['TEMPERATURA']} °C")
-                print(f"Frecuencia Cardíaca: {p['F_CARD']} bpm")
-                print(f"Presión Arterial Media: {p['PAM']}")
-                print(f"Saturación O₂: {p['N_OXIGENO']} %")
-                print(f"Glucosa: {p['GLUCOSA']} mg/dL")
-                print(f"Colesterol: {p['COLESTEROL']} mg/dL")
-                print(f"IMC: {p['IMC']}")
-                print("-" * 50) #línea separadora entre cada paciente para más orden
+            else:
+                print("\n---PACIENTES EN ESTADO CRÍTICO---")
+                for p in criticos:
+                    print(f"\nID: {p['ID']}")
+                    print(f"Nombre: {p['NOMBRE']}")
+                    print(f"Edad: {p['EDAD']} años")
+                    print(f"Temperatura: {p['TEMPERATURA']} °C")
+                    print(f"Frecuencia Cardíaca: {p['F_CARD']} bpm")
+                    print(f"Presión Arterial Media: {p['PAM']}")
+                    print(f"Saturación O₂: {p['N_OXIGENO']} %")
+                    print(f"Glucosa: {p['GLUCOSA']} mg/dL")
+                    print(f"Colesterol: {p['COLESTEROL']} mg/dL")
+                    print(f"IMC: {p['IMC']}")
+                    print("-" * 50) #línea separadora entre cada paciente para más orden
+                
 
     except Exception as e:
         print(f"Error al mostrar pacientes críticos: {e}")
+    
+    return
 
-def calcular_imc_general():
+def calcular_imc_general(salida_p):
     try:
-        with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+        with open(salida_p, "r", encoding="utf-8-sig") as archivo:
             reader = csv.DictReader(archivo)
-            imcs = []
+            imcs = [] #lista para imcs validos
 
-            for fila in reader:
+            for fila in reader: #recorro cada fila del csv
                 try:
-                    peso = float(fila.get("PESO", 0))
-                    altura = float(fila.get("ALTURA", 0))
-                    imc = calcular_imc(peso, altura)
+                    imc = float(fila.get("IMC", 0)) #imc individual
                     if imc > 0:  #valores válidos
-                        imcs.append(imc) #agrego
+                        imcs.append(imc) #agrego a la lista
                 except:
-                    continue
+                    continue 
 
             if not imcs:
                 print("No hay datos válidos para calcular el IMC general.")
@@ -493,7 +552,94 @@ def calcular_imc_general():
     except Exception as e:
         print(f"Error al calcular IMC general: {e}")
         return None
+    
+def promedio_edad(salida_p):
+    try:
+        with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+            reader = csv.DictReader(archivo) #DictReader transforma cada fila en un diccionario
+            suma_edades = 0 #acumulador
+            cont = 0
 
+            for fila in reader: 
+               edad_original = fila.get("EDAD", "").strip()
+               if edad_original == "": 
+                   continue
+               
+               try: 
+                   edad_numeric = float(edad_original)
+               except Exception:
+                    continue  
+               
+               if edad_numeric <=0: #verifico que la edad sea razonable
+                   continue
+               suma_edades += edad_numeric
+               cont += 1
+            if cont == 0:
+                print("No se encontraron edades válidas en el archivo.")
+                return None
+            promedio =float(suma_edades/cont)
+            print(f"Promedio de edad general: {promedio:.2f} años (sobre {cont} pacientes).")
+    except Exception as e:
+        print(f"Error al calcular el promedio de edad: {e}")
+        return None
+    
+def extremos_f_card():
+    try:
+        with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+                reader = csv.DictReader(archivo)
+                pacientes = [] #para guardar diccionarios de pacientes validos
+                valores = [] #para guardar solo las frecuencias
+
+                for fila in reader:
+                    f_card_original = fila.get("F_CARD", "").strip() #valor que esta en la columna (F_CARD) de cada fila
+                    if f_card_original == "":
+                        continue #si esta vacia la salteo
+                    try:
+                        f_card = float(f_card_original)
+                    except Exception:
+                        continue
+                    #guardo el paciente y su frecuencia
+                    pacientes.append({ "ID" : fila.get("ID" , ""),
+                                    "NOMBRE" : fila.get("NOMBRE", ""),
+                                    "EDAD" : fila.get("EDAD", ""),
+                                    "F_CARD" : f_card
+                                    })
+                    valores.append(f_card) #guardo el numero
+
+                if not pacientes:
+                    print("No hay pacientes con frecuencia cardíaca válida.")
+                    return None
+                
+                #obtengo las frecuencias maximas y minimas
+                max_f = max(valores)
+                min_f = min(valores)
+
+                #filtro todos los pacientes que tienen la frecuencia mínima y máxima
+                pacientes_min = []
+                for p in pacientes:
+                    if p["F_CARD"] == min_f:
+                        pacientes_min.append(p)
+                pacientes_max = []
+                for p in pacientes:
+                    if p["F_CARD"] == max_f:
+                        pacientes_max.append(p)
+
+                pacientes_min = []
+                for p in pacientes:
+                    if p["F_CARD"] == min_f: 
+                        pacientes_min.append(p) #egrega el diccionario p al final de la lista
+
+                print(f"Frecuencia cardíaca MÍNIMA: {min_f} bmp (pacientes: {len(pacientes_min)})") 
+                for p in pacientes_min:
+                    print(f"ID: {p['ID']} | Nombre: {p['NOMBRE']} | Edad: {p['EDAD']} | F_CARD: {p['F_CARD']}")
+                print("-"*60)
+                print(f"Frecuencia cardíaca MÁXIMA: {max_f} bmp (pacientes: {len(pacientes_max)})") 
+                for p in pacientes_max:
+                    print(f"ID: {p['ID']} | Nombre: {p['NOMBRE']} | Edad: {p['EDAD']} | F_CARD: {p['F_CARD']}")
+
+    except Exception as e:
+        print(f"Error al obtener extremos de F_CARD: {e}")
+        return None
 #--MENU--
 def menu():
     while True:
