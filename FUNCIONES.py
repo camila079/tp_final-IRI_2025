@@ -144,12 +144,14 @@ def eliminar_paciente(id, entrada_p):
                     else:
                         pacientes_eliminados.append(fila)
                         
-    with open(entrada_p, "w", encoding="utf-8-sig", newline=""):
+    with open("pacientes_eliminados", "w", encoding="utf-8-sig", newline="") as archivo:
         writer = csv.DictWriter(archivo, fieldnames=fieldnames)
         writer.writeheader
-        writer.writerow(filas_filtradas)
+        writer.writerow(pacientes_eliminados)
+    salida_p = "pacientes_2025.csv"
+    escribir_archivo(salida_p, filas_filtradas)####
         
-    return filas_filtradas 
+    return
 
 def calcular_porcentaje_R_IR(percent_r, percent_ir):
     porcentaje_r_ir = 0.0
