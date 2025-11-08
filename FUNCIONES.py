@@ -110,10 +110,13 @@ def dar_alta_paciente(entrada_p):
 
     # Escribir la lista actualizada de nuevo en el archivo
     salida_p = "pacientes_2025.csv"
-    with open(salida_p, 'w', encoding="utf-8-sig", newline="") as f:
+    escribir_archivo(salida_p, pacientes)####
+    
+def escribir_archivo(ruta, lista)
+    with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
         writer.writeheader()
-        writer.writerows(pacientes)
+        writer.writerows(lista)
             #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
 
     print("Paciente dado de alta exitosamente.")
