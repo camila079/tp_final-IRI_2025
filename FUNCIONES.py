@@ -390,16 +390,16 @@ def buscar_paciente_por_apellido(apellido):
 
 #PUNTO 3: Clasificacion y triage
 def triage_paciente (id):
-    p = buscar_paciente(id)
-    # Evitar múltiples llamados con .get()
-
-    fc = p.get("frecuencia_cardiaca", None)
-    pam = p.get("presion_arterial", None)
-    temp = p.get("temperatura", None)
-    oxi = p.get("nivel_oxigeno", None)
-    imc = p.get("imc", None)
-    glu = p.get("glucosa", None)
-    col = p.get("colesterol", None)
+    try:
+        fc = float(p.get("F_CARD", 0) or 0)
+        pam = float(p.get("PAM", 0) or 0)
+        temp = float(p.get("TEMPERATURA", 0) or 0)
+        oxi = float(p.get("N_OXIGENO", 0) or 0)
+        imc = float(p.get("IMC", 0) or 0)
+        glu = float(p.get("GLUCOSA", 0) or 0)
+        col = float(p.get("COLESTEROL", 0) or 0)
+    except AttributeError:
+        return "Error"
 
     # Clasifico por prioridad descendente
     criterios = [
