@@ -8,97 +8,58 @@ entrada_sen = "ecg_id_pacient.csv"
 
 
 def graficar_lineas_senyales(ruta, entrada_sen):
-    pacientes, imc, pam, clasificacion = eu.archivos_aux(ruta)
+    pacientes, imc, pam, clasificacion = archivos_aux(ruta)
     datos_sen = eu.acceder_ecg(entrada_sen)
-    graficos_color = []
+    
+    # Diccionario para guardar IDs por color
+    ids_por_color = {
+        "Azul": None, "Verde": None, "Amarillo": None,
+        "Naranja": None, "Rojo": None, "Negro": None
+    }
+
+    # Asigno el ID de cada color (el primero que aparezca)
     for paciente in pacientes:
-        #Busco el id de pacientes de cada color(estado del paciente)
-        if(paciente["clasificacion"] == "Azul"):
-            id_azul = paciente["id_paciente"]
-        elif(paciente["clasificacion"] == "Verde"):
-            id_verde = paciente["id_paciente"]
-        elif(paciente["clasificacion"] == "Amarillo"):
-            id_amarillo = paciente["id_paciente"]
-        elif(paciente["clasificacion"] == "Naranja"):
-            id_naranja = paciente["id_paciente"]
-        elif(paciente["clasificacion"] == "Rojo"):
-            id_rojo = paciente["id_paciente"]
-        elif(paciente["clasificacion"] == "Negro"):
-            id_negro = paciente["id_paciente"]
-            
-        #Accedo a cada uno de los nombres de los archivos de los ids encontrados    
-        for dato in datos_sen:
-            if id_azul in datos_sen:
-                graf_azul = dato
-            elif id_verde in datos_sen:
-                graf_verde = dato
-            elif id_amarillo in datos_sen:
-                graf_amarillo = dato
-            elif id_naranja in datos_sen:
-                graf_naranja = dato
-            elif id_rojo in datos_sen:
-                graf_rojo = dato
-            elif id_negro in datos_sen:
-                graf_negro = dato
-                
-    #graf azul
-    ruta_az = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_azul)
-    senyales_az = eu.abrir_archivos(ruta_az)
-    y_az = np.array(senyales_az)
-    plt.subplot(2, 3, 1)
-    plt.plot(y_az, color = 'blue')
-    plt.title("ECG - Paciente en estado 'Azul'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
-    
-    #graf verde
-    ruta_v = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_verde)
-    senyales_v = eu.abrir_archivos(ruta_v)
-    y_v = np.array(senyales_v)
-    plt.subplot(2, 3, 2)
-    plt.plot(y_v, color = 'green')
-    plt.title("ECG - Paciente en estado 'Verde'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
-    
-    #graf amarillo
-    ruta_am = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_amarillo)
-    senyales_am = eu.abrir_archivos(ruta_am)
-    y_am = np.array(senyales_am)
-    plt.plot(y_am, color = 'yellow')
-    plt.title("ECG - Paciente en estado 'Amarillo'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
+        color = paciente["clasificacion"]
+        if color in ids_por_color and ids_por_color[color] is None:
+            ids_por_color[color] = paciente["id_paciente"]
 
+    # Buscar el archivo ECG correspondiente a cada color
+    archivos_ecg = {}
+    for color, id_paciente in ids_por_color.items():
+        if id_paciente:
+            for dato in datos_sen:
+                if id_paciente in dato:
+                    archivos_ecg[color] = dato
+                    break
     
-    #graf naranja
-    ruta_nar = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_naranja)
-    senyales_nar = eu.abrir_archivos(ruta_nar)
-    y_nar = np.array(senyales_nar)
-    plt.plot(y_nar, color = 'orange')
-    plt.title("ECG - Paciente en estado 'Naranja'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
+    
+    colores = {
+        "Azul": "blue", "Verde": "green", "Amarillo": "yellow",
+        "Naranja": "orange", "Rojo": "red", "Negro": "black"
+    }
 
-    
-    #graf rojo
-    ruta_r = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_rojo)
-    senyales_r = eu.abrir_archivos(ruta_r)
-    y_r = np.array(senyales_r)
-    plt.plot(y_r, color = 'red')
-    plt.title("ECG - Paciente en estado 'Rojo'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
-    
-    #graf negro
-    ruta_neg = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", graf_negro)
-    senyales_neg = eu.abrir_archivos(ruta_neg)
-    y_neg = np.array(senyales_neg)
-    plt.plot(y_neg, color = 'black')
-    plt.title("ECG - Paciente en estado 'Negro'")
-    plt.xlabel("Tiempo(seg.)")
-    plt.ylabel("Amplitud")
-    
+    plt.figure(figsize=(12, 8))
+    i = 1
+    for color, archivo in archivos_ecg.items():
+        if not archivo:
+            print(f"No hay pacientes en estado {color.lower()}")
+            continue
+        #
+        ruta_archivo = os.path.join(
+            r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals",
+            archivo
+        )
+        senyales = eu.abrir_archivos(ruta_archivo)
+        y = np.array(senyales)
+
+        plt.subplot(2, 3, i)
+        plt.plot(y, color=colores[color])
+        plt.title(f"ECG - Paciente en estado '{color}'")
+        plt.xlabel("Tiempo (seg.)")
+        plt.ylabel("Amplitud")
+        i += 1
+        
+    plt.tight_layout()
     plt.show()
     
     return
