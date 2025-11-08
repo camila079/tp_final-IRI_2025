@@ -112,7 +112,7 @@ def dar_alta_paciente(entrada_p):
     salida_p = "pacientes_2025.csv"
     escribir_archivo(salida_p, pacientes)####
     
-def escribir_archivo(ruta, lista)
+def escribir_archivo(ruta, lista):
     with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
         writer.writeheader()
@@ -398,13 +398,13 @@ def buscar_paciente_por_apellido(apellido):
 #PUNTO 3: Clasificacion y triage
 def triage_paciente (id):
     try:
-        fc = float(p.get("F_CARD", 0) or 0)
-        pam = float(p.get("PAM", 0) or 0)
-        temp = float(p.get("TEMPERATURA", 0) or 0)
-        oxi = float(p.get("N_OXIGENO", 0) or 0)
-        imc = float(p.get("IMC", 0) or 0)
-        glu = float(p.get("GLUCOSA", 0) or 0)
-        col = float(p.get("COLESTEROL", 0) or 0)
+        fc = float(id.get("F_CARD", 0) or 0)
+        pam = float(id.get("PAM", 0) or 0)
+        temp = float(id.get("TEMPERATURA", 0) or 0)
+        oxi = float(id.get("N_OXIGENO", 0) or 0)
+        imc = float(id.get("IMC", 0) or 0)
+        glu = float(id.get("GLUCOSA", 0) or 0)
+        col = float(id.get("COLESTEROL", 0) or 0)
     except AttributeError:
         return "Error"
 
@@ -683,14 +683,17 @@ def menu():
 def minimenu1 ():
     sub_op=input("Seleccione una subopcion: ")
     if sub_op == "a":
-            buscar_paciente_por_apellido(apellido)    
+        apellido=input("Ingrese el apellido del paciente que busca")
+        buscar_paciente_por_apellido(apellido)    
     elif sub_op == "b":
+        id=input("Ingrese el ID del paciente que busca")
         buscar_paciente(id)
     else:
         print("Sub-opción inválida.")
 def minimenu2 ():
     sub_op=input("Seleccione una subopcion: ")
     if sub_op == "a":
+        id=input("Ingrese el ID del paciente que desea eliminar")
         eliminar_paciente(id, salida_p)
     elif sub_op == "b":
         dar_alta_paciente(salida_p)
@@ -704,6 +707,9 @@ def minimenu3 ():
     elif sub_op == "b":
         gr.graficar_lineas_senyales(salida_p, entrada_s)
     elif sub_op== "c":
+        grafico_dispersion()
+    else:
+        print("Sub-opción inválida.")
         grafico_dispersion()
     else:
         print("Sub-opción inválida.")
