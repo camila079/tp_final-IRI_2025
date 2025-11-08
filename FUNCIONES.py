@@ -224,6 +224,8 @@ def sumar_info_pacientes(entrada_p):
     pacientes = leer_pacientes(entrada_p)
     salida_p = "pacientes_2025.csv"
     calcular_valores(pacientes)
+    for paciente in pacientes:        
+        paciente["CLASIFICACION"] = triage_paciente(paciente)
     with open(salida_p, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
             writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
             writer.writeheader()
