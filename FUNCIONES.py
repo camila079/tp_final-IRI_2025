@@ -24,9 +24,9 @@ keysdeclinicas = [
 pacientes = [] #guardo los pecientes en una lista
 
 #abro el archivo para leerlo y guardar lo necesario
-def leer_pacientes(entrada_p):
+def leer_pacientes(file):
         with open(file, "r", encoding="utf-8-sig", newline="") as p:
-        reader = csv.DictReader(p)
+            reader = csv.DictReader(p)
 
         for fila in reader:
             id_paciente = fila["paciente_id"]
@@ -52,7 +52,7 @@ def leer_pacientes(entrada_p):
                         }
             pacientes.append(paciente)
             escribir_archivo(salida_p,pacientes)
-    return pacientes
+            return pacientes
         #y corrijo errores en el ingreso de archivos (pending....)
 def escribir_archivo(file, lista):  #nuevito
     pacientes = lista  
