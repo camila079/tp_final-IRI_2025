@@ -25,7 +25,7 @@ pacientes = [] #guardo los pecientes en una lista
 
 #abro el archivo para leerlo y guardar lo necesario
 def leer_pacientes(entrada_p):
-    with open(entrada_p, "r", encoding="utf-8-sig", newline="") as p:
+        with open(file, "r", encoding="utf-8-sig", newline="") as p:
         reader = csv.DictReader(p)
 
         for fila in reader:
@@ -51,9 +51,12 @@ def leer_pacientes(entrada_p):
                         "CLASIFICACION": 0
                         }
             pacientes.append(paciente)
-    #try:
+            escribir_archivo(salida_p,pacientes)
+    return pacientes
         #y corrijo errores en el ingreso de archivos (pending....)
-    with open(salida_p, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
+def escribir_archivo(file, lista):  #nuevito
+    pacientes = lista  
+    with open(file, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
         writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
         writer.writeheader()
         for paciente in pacientes:
@@ -71,87 +74,11 @@ def leer_pacientes(entrada_p):
             writer.writerows(pacientes)
     return pacientes
 
-def dar_alta_paciente(entrada_p):
-    # Leer pacientes existentes
-    pacientes = leer_pacientes(entrada_p)
-
-    # Obtener datos del nuevo paciente
-    nombre = input("Ingresa el nombre y apellido del nuevo paciente: ")
-    # salida_p [eval(linea.strip()) for linea in lineas]input("Ingrese
-    edad = int(input("Ingrese edad: "))
-    peso = float(input("Ingrese peso (Kg): "))
-    altura = float(input("Ingrese altura (m): "))
-    sistolica = input("Ingrese sistolica (MMHG): ")
-    diastolica = input("Ingrese diastolica (MMHG): ")
-    temperatura =input("Ingrese temperatura (°c): ")
-    f_card = input("Ingrese frecuencia cardiaca: ")
-    n_oxigeno = input("Ingrese nivel de oxigeno: ")
-    glucosa = input("Ingrese glucosa: ")  
-    colesterol = input("Ingrese colesterol: ")
-    pulsoximetro_r = input("Ingrese pulsoximetro rojo: ")             
-    pulsoximetro_ir = input("Ingrese pulsoximetro infrarrojo: ")                 
-    # Crear el nuevo registro y agregarlo
-    nuevo_paciente = {
-        "ID": generar_id(),
-        "NOMBRE": nombre,
-        "EDAD": edad,
-        "PESO": peso,
-        "ALTURA": altura,
-        "SISTOLICA": sistolica,
-        "DIASTOLICA": diastolica,
-        "TEMPERATURA": temperatura,
-        "F_CARD": f_card,
-        "N_OXIGENO": n_oxigeno,
-        "GLUCOSA": glucosa,
-        "COLESTEROL": colesterol,
-        "PULSOXIMETRO_R": pulsoximetro_r,
-        "PULSOXIMETRO_IR": pulsoximetro_ir}
-    pacientes.append(nuevo_paciente)
-
-    # Escribir la lista actualizada de nuevo en el archivo
-    salida_p = "pacientes_2025.csv"
-    escribir_archivo(salida_p, pacientes)####
-    
-def escribir_archivo(ruta, lista):
+def sobrescribir_archivo(ruta, lista):
     with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
         writer.writeheader()
         writer.writerows(lista)
-            #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
-
-    print("Paciente dado de alta exitosamente.")
-def generar_id():
-    pacientes, imc, pam, clasificacion = archivos_aux(salida_p)
-
-    lista_ids = [p["id_paciente"] for p in pacientes]
-
-    numeros = [int(i[1:]) for i in lista_ids if i.startswith("P") and i[1:].isdigit()]
-    
-    nuevo_numero = max(numeros) + 1 if numeros else 1
-    
-    new=f"P{nuevo_numero:04d}"
-
-    return new
-def eliminar_paciente(id, entrada_p):
-    filas_filtradas = []
-    pacientes_eliminados = []
-    with open(entrada_p, "r", encoding="utf-8-sig") as archivo:
-                reader = csv.DictReader(archivo)
-                fieldnames = reader.fieldnames
-                for fila in reader:
-                    if fila["ID"] != id:
-                        filas_filtradas.append(fila)
-                    else:
-                        pacientes_eliminados.append(fila)
-                        
-    with open("pacientes_eliminados", "w", encoding="utf-8-sig", newline="") as archivo:
-        writer = csv.DictWriter(archivo, fieldnames=fieldnames)
-        writer.writeheader
-        writer.writerow(pacientes_eliminados)
-    salida_p = "pacientes_2025.csv"
-    escribir_archivo(salida_p, filas_filtradas)####
-        
-    return
 
 def calcular_porcentaje_R_IR(percent_r, percent_ir):
     porcentaje_r_ir = 0.0
@@ -162,7 +89,6 @@ def calcular_porcentaje_R_IR(percent_r, percent_ir):
         porcentaje_r_ir = 100*(percent_ir/(sum_r_ir))
     
     return porcentaje_r_ir
-
 def calcular_imc(masa, altura):
     imc = 0.0
     if (altura<=0):
@@ -172,12 +98,10 @@ def calcular_imc(masa, altura):
     else: 
         imc = float(masa)/pow(float(altura),2)
     return imc 
-
 def calcular_pres_am(p_dias,p_sis):
     pam = 0.0
     pam = (((2*float(p_dias))+float(p_sis))/3)
     return pam
-
 def calcular_relacion_gc(gluc, colest):
     gc = 0.0
     if (colest<=0):
@@ -218,36 +142,20 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         colesterol = paciente["COLESTEROL"]
         rgc = calcular_relacion_gc(glucosa, colesterol)
         paciente["RGC"]= rgc
-        
-        if(imc == -1 or pam == -1 or oxim == -1 or rgc == -1):
-            eliminar_paciente(paciente["ID"], entrada_p)
             
     return
 
-#reescribo 
-def sumar_info_pacientes(entrada_p):
-    pacientes = leer_pacientes(entrada_p)
-    salida_p = "pacientes_2025.csv"
+def sumar_info_pacientes(file):
+    pacientes = leer_pacientes(file)
     calcular_valores(pacientes)
-    for paciente in pacientes:        
+    for paciente in pacientes:
         paciente["CLASIFICACION"] = triage_paciente(paciente)
-    with open(salida_p, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
-            writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
-            writer.writeheader()
-            writer.writerows(pacientes)
 
-#PUNTO 2: Analisis de ECG
-def abrir_archivos(ruta):
-    with open(ruta, "r") as f:
-            return np.array([float(x.strip()) for x in f.readlines()])
-import csv
+    sobrescribir_archivo("pacientes_2025.csv", pacientes)
 
 def archivos_aux(ruta):
     with open(ruta, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
-        imc = []
-        pam = []
-        clasificacion = []
         pacientes = []
 
         for row in reader:
@@ -263,14 +171,122 @@ def archivos_aux(ruta):
                 "clasificacion": clase
             })
 
-            imc.append(imc_val)
-            pam.append(pam_val)
-            clasificacion.append(clase)
+    return pacientes
 
-    return pacientes, imc, pam, clasificacion
+def dar_alta_paciente(salida_p):
+    # Leer pacientes existentes
+    # pacientes = leer_pacientes(entrada_p)
+    # Obtener datos del nuevo paciente
+    nombre = input("Ingresa el nombre y apellido del nuevo paciente: ")
+    # salida_p [eval(linea.strip()) for linea in lineas]input("Ingrese
+    edad = int(input("Ingrese edad: "))
+    peso = float(input("Ingrese peso (Kg): "))
+    altura = float(input("Ingrese altura (m): "))
+    sistolica = input("Ingrese sistolica (MMHG): ")
+    diastolica = input("Ingrese diastolica (MMHG): ")
+    temperatura =input("Ingrese temperatura (°c): ")
+    f_card = input("Ingrese frecuencia cardiaca: ")
+    n_oxigeno = input("Ingrese nivel de oxigeno: ")
+    glucosa = input("Ingrese glucosa: ")  
+    colesterol = input("Ingrese colesterol: ")
+    pulsoximetro_r = input("Ingrese pulsoximetro rojo: ")             
+    pulsoximetro_ir = input("Ingrese pulsoximetro infrarrojo: ")                 
+    # Crear el nuevo registro y agregarlo
+    nuevo_paciente = {
+        "ID": generar_id(),
+        "NOMBRE": nombre,
+        "EDAD": edad,
+        "PESO": peso,
+        "ALTURA": altura,
+        "SISTOLICA": sistolica,
+        "DIASTOLICA": diastolica,
+        "TEMPERATURA": temperatura,
+        "F_CARD": f_card,
+        "N_OXIGENO": n_oxigeno,
+        "GLUCOSA": glucosa,
+        "COLESTEROL": colesterol,
+        "PULSOXIMETRO_R": pulsoximetro_r,
+        "PULSOXIMETRO_IR": pulsoximetro_ir}
+    pacientes.append(nuevo_paciente)
 
-#devuelve max min y promedio
+    # Escribir la lista actualizada de nuevo en el archivo
+    salida_p = "pacientes_2025.csv"
+    escribir_archivo(salida_p, pacientes)####
+    print("Paciente dado de alta exitosamente.")
+def escribir_archivo(ruta, lista):
+    with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
+        writer.writeheader()
+        writer.writerows(lista)
+            #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
+def generar_id(file):
+    pacientes = archivos_aux(file)
 
+    lista_ids = [p["id_paciente"] for p in pacientes]
+
+    numeros = [int(i[1:]) for i in lista_ids if i.startswith("P") and i[1:].isdigit()]
+    
+    nuevo_numero = max(numeros) + 1 if numeros else 1
+    
+    new=f"P{nuevo_numero:04d}"
+
+    return new
+
+def triage_paciente (id):
+    try:
+        fc = float(id.get("F_CARD", 0) or 0)
+        pam = float(id.get("PAM", 0) or 0)
+        temp = float(id.get("TEMPERATURA", 0) or 0)
+        oxi = float(id.get("N_OXIGENO", 0) or 0)
+        imc = float(id.get("IMC", 0) or 0)
+        glu = float(id.get("GLUCOSA", 0) or 0)
+        col = float(id.get("COLESTEROL", 0) or 0)
+    except AttributeError:
+        return "Error"
+
+    # Clasifico por prioridad descendente
+    criterios = [
+        ("Negro", fc == 0 and pam == 0),
+        ("Rojo", temp and temp > 39.5),
+        ("Rojo", oxi and oxi < 85),
+        ("Rojo", pam and (pam < 60 or pam > 120)),
+        ("Naranja", temp and 38.5 <= temp <= 39.5),
+        ("Naranja", fc and (fc < 50 or fc > 120)),
+        ("Naranja", oxi and 85 <= oxi <= 92),
+        ("Naranja", imc and imc > 40),
+        ("Amarillo", temp and 37.5 <= temp < 38.5),
+        ("Amarillo", glu and glu > 180),
+        ("Amarillo", col and col > 240),
+        ("Verde", imc and 25 <= imc <= 30),
+        ("Verde", glu and col and glu > 100 and col > 200),
+    ]
+
+    for color, condicion in criterios:
+        if condicion:
+            return color
+
+    return "Azul"
+def eliminar_paciente(id, file):
+    filas_filtradas = []
+    pacientes_eliminados = []
+    with open(file, "r", encoding="utf-8-sig") as archivo:
+                reader = csv.DictReader(archivo)
+                fieldnames = reader.fieldnames
+                for fila in reader:
+                    if fila["ID"] != id:
+                        filas_filtradas.append(fila)
+                    else:
+                        pacientes_eliminados.append(fila)
+                        
+    with open("pacientes_eliminados", "w", encoding="utf-8-sig", newline="") as archivo:
+        writer = csv.DictWriter(archivo, fieldnames=fieldnames)
+        writer.writeheader
+        writer.writerow(pacientes_eliminados)
+    salida_p = "pacientes_2025.csv"
+    escribir_archivo(salida_p, filas_filtradas)####
+        
+    return
+    
 def acceder_ecg(entrada_s):
     datos = []
     try:
@@ -395,43 +411,7 @@ def buscar_paciente_por_apellido(apellido):
 
     return
 
-#PUNTO 3: Clasificacion y triage
-def triage_paciente (id):
-    try:
-        fc = float(id.get("F_CARD", 0) or 0)
-        pam = float(id.get("PAM", 0) or 0)
-        temp = float(id.get("TEMPERATURA", 0) or 0)
-        oxi = float(id.get("N_OXIGENO", 0) or 0)
-        imc = float(id.get("IMC", 0) or 0)
-        glu = float(id.get("GLUCOSA", 0) or 0)
-        col = float(id.get("COLESTEROL", 0) or 0)
-    except AttributeError:
-        return "Error"
 
-    # Clasifico por prioridad descendente
-    criterios = [
-        ("Negro", fc == 0 and pam == 0),
-        ("Rojo", temp and temp > 39.5),
-        ("Rojo", oxi and oxi < 85),
-        ("Rojo", pam and (pam < 60 or pam > 120)),
-        ("Naranja", temp and 38.5 <= temp <= 39.5),
-        ("Naranja", fc and (fc < 50 or fc > 120)),
-        ("Naranja", oxi and 85 <= oxi <= 92),
-        ("Naranja", imc and imc > 40),
-        ("Amarillo", temp and 37.5 <= temp < 38.5),
-        ("Amarillo", glu and glu > 180),
-        ("Amarillo", col and col > 240),
-        ("Verde", imc and 25 <= imc <= 30),
-        ("Verde", glu and col and glu > 100 and col > 200),
-    ]
-
-    for color, condicion in criterios:
-        if condicion:
-            return color
-
-    return "Azul"
-
-#PUNTO 4: Reporte y Visualizacion
 #PUNTO 4: Reporte y Visualizacion 
 def reporte_general(salida_p):
         try:
