@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import os
-import graficos as gr
+import GRAFICOS as gr
 
 #PUNTO 1: LECTURA Y PROCESAMIENTO
 #escribo los nombres de mis csv aca arriba por si quiero cambiar el archivo que le doy o el nombre del nuevo
@@ -28,31 +28,31 @@ def leer_pacientes(file):
         with open(file, "r", encoding="utf-8-sig", newline="") as p:
             reader = csv.DictReader(p)
 
-        for fila in reader:
-            id_paciente = fila["paciente_id"]
-            paciente = {"ID": id_paciente,
-                        "NOMBRE": fila["nombre_paciente"].upper(),
-                        "EDAD": fila["edad"],
-                        "PESO": fila["peso_kg"],
-                        "ALTURA": fila["altura_m"],
-                        "SISTOLICA": fila["sistolica_mmHg"],
-                        "DIASTOLICA": fila["diastolica_mmHg"],
-                        "TEMPERATURA": fila["temperatura_C"],
-                        "F_CARD": fila["frecuencia_cardiaca_lpm"],
-                        "N_OXIGENO": fila["nivel_oxigeno_perc"],
-                        "GLUCOSA": fila["glucosa_mg_dL"],
-                        "COLESTEROL": fila["colesterol_mg_dL"],
-                        "PULSOXIMETRO_R": fila["pulsoximetro_r_perc"],
-                        "PULSOXIMETRO_IR": fila["pulsoximetro_ir_perc"],
-                        "IMC": 0.0,                         
-                        "PAM": 0, 
-                        "SPO2": 0, 
-                        "RGC": 0,
-                        "CLASIFICACION": 0
-                        }
-            pacientes.append(paciente)
-            escribir_archivo(salida_p,pacientes)
-            return pacientes
+            for fila in reader:
+                id_paciente = fila["paciente_id"]
+                paciente = {"ID": id_paciente,
+                            "NOMBRE": fila["nombre_paciente"].upper(),
+                            "EDAD": fila["edad"],
+                            "PESO": fila["peso_kg"],
+                            "ALTURA": fila["altura_m"],
+                            "SISTOLICA": fila["sistolica_mmHg"],
+                            "DIASTOLICA": fila["diastolica_mmHg"],
+                            "TEMPERATURA": fila["temperatura_C"],
+                            "F_CARD": fila["frecuencia_cardiaca_lpm"],
+                            "N_OXIGENO": fila["nivel_oxigeno_perc"],
+                            "GLUCOSA": fila["glucosa_mg_dL"],
+                            "COLESTEROL": fila["colesterol_mg_dL"],
+                            "PULSOXIMETRO_R": fila["pulsoximetro_r_perc"],
+                            "PULSOXIMETRO_IR": fila["pulsoximetro_ir_perc"],
+                            "IMC": 0.0,                         
+                            "PAM": 0, 
+                            "SPO2": 0, 
+                            "RGC": 0,
+                            "CLASIFICACION": 0
+                            }
+                pacientes.append(paciente)
+                escribir_archivo(salida_p,pacientes)
+        return pacientes
         #y corrijo errores en el ingreso de archivos (pending....)
 def escribir_archivo(file, lista):  #nuevito
     pacientes = lista  
@@ -72,6 +72,27 @@ def escribir_archivo(file, lista):  #nuevito
             paciente["GLUCOSA"] = round(int(paciente["N_OXIGENO"]))
             paciente["COLESTEROL"] = round(int(paciente["COLESTEROL"]))
             writer.writerows(pacientes)
+            
+            #Manejo de errores
+            if(paciente["EDAD"]<0):
+                id_e = paciente["ID"]
+                eliminar_paciente(id_e, file)
+                
+            if(paciente["TEMPERATURA"]>50 or paciente["TEMPERATURA"]<27):
+                id_t = paciente["ID"]
+                eliminar_paciente(id_t, file)
+            
+            if(paciente["F_CARD"]<27 or paciente["F_CARD"]>500):
+                id_f = paciente["ID"]
+                eliminar_paciente(id_f, file)
+            
+            if(paciente["COLESTEROL"]<0 or paciente["COLESTEROL"]>500):
+                id_c = paciente["ID"]
+                eliminar_paciente(id_c, file)
+                
+            if(paciente["GLUCOSA"]<0 or paciente["GLUCOSA"]>900):
+                id_g = paciente["ID"]
+                eliminar_paciente(id_g, file)  
     return pacientes
 
 def sobrescribir_archivo(ruta, lista):
@@ -112,6 +133,7 @@ def calcular_relacion_gc(gluc, colest):
     return gc
 
 def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del paciente
+    file="pacientes_2025.csv"
     #longitud_datos = len(pacientedatos)
     imc = 0.0 #Indice de masa corporal    
     pam = 0.0 #Presion arterial media
@@ -119,33 +141,54 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
     rgc = 0.0 #Relacion glucosa-colesterol
     for paciente in pacientedatos:
         #IMC= masa/altura*altura
-        masa = paciente["PESO"]
+        #masa = (paciente["PESO"]))
+        try:
+            masa = float(paciente["PESO"])
+        except (ValueError, TypeError):
+            masa = 0
+
         altura = float(paciente["ALTURA"])
         imc = calcular_imc(masa, altura)
-        paciente["IMC"] = imc  
+        if(imc<16 or imc>200):
+            id_e = paciente["ID"]
+            eliminar_paciente(id_e, file)
+        else:    
+            paciente["IMC"] = imc  
               
         #pam =PDias+(PSis+PDias)/3
         pres_diastolica = paciente["DIASTOLICA"]
         pres_sistolica = paciente["SISTOLICA"]
         pam = calcular_pres_am(pres_diastolica, pres_sistolica)
-        paciente["PAM"]= pam
+        if(pam<20 or pam>200):
+            id_e = paciente["ID"]
+            eliminar_paciente(id_e, file)
+        else:    
+            paciente["PAM"] = pam 
+        
 
         #oximetria = 100*(IF/(R+IF))
         porcentaje_roja= float(paciente["PULSOXIMETRO_R"])
         porcentaje_infrarroja= float(paciente["PULSOXIMETRO_IR"])
         # calcular_porcentaje_R_IR()
         oxim = calcular_porcentaje_R_IR(porcentaje_roja, porcentaje_infrarroja)
-        paciente["SPO2"] = oxim
+        if(oxim<50 or oxim>100):
+            id_e = paciente["ID"]
+            eliminar_paciente(id_e, file)
+        else:    
+            paciente["SPO2"] = oxim 
+        
+
         
         #rgc = glu/col
         glucosa = paciente["GLUCOSA"]
-        colesterol = paciente["COLESTEROL"]
+        colesterol = int(paciente["COLESTEROL"])
         rgc = calcular_relacion_gc(glucosa, colesterol)
         paciente["RGC"]= rgc
             
     return
 
 def sumar_info_pacientes(file):
+    file= "pacientes_final.csv"
     pacientes = leer_pacientes(file)
     calcular_valores(pacientes)
     for paciente in pacientes:
@@ -193,7 +236,7 @@ def dar_alta_paciente(salida_p):
     pulsoximetro_ir = input("Ingrese pulsoximetro infrarrojo: ")                 
     # Crear el nuevo registro y agregarlo
     nuevo_paciente = {
-        "ID": generar_id(),
+        "ID": generar_id(salida_p),
         "NOMBRE": nombre,
         "EDAD": edad,
         "PESO": peso,
@@ -281,7 +324,7 @@ def eliminar_paciente(id, file):
     with open("pacientes_eliminados", "w", encoding="utf-8-sig", newline="") as archivo:
         writer = csv.DictWriter(archivo, fieldnames=fieldnames)
         writer.writeheader
-        writer.writerow(pacientes_eliminados)
+        writer.writerows(pacientes_eliminados)
     salida_p = "pacientes_2025.csv"
     escribir_archivo(salida_p, filas_filtradas)####
         
@@ -305,6 +348,10 @@ def acceder_ecg(entrada_s):
     
     return datos
 
+def abrir_archivos(ruta):
+    with open(ruta, "r") as f:
+            return np.array([float(x.strip()) for x in f.readlines()])
+
 def ecg_senyales(entrada_s):
     max_señales = []
     min_señales = []
@@ -323,7 +370,9 @@ def ecg_senyales(entrada_s):
     return max_señales, min_señales, prom_señales
 
 def buscar_paciente(id):
+    salida_p = "pacientes_2025.csv"
     id_limpio = id.strip().upper()
+
     if not id_limpio.startswith("P"):
         id_limpio = "P" + id_limpio
 
@@ -332,7 +381,7 @@ def buscar_paciente(id):
             reader = csv.DictReader(archivo)
             for fila in reader:
                 if id_limpio == fila.get("ID", "").strip().upper():
-                    return {
+                    print ({
                         "ID": id_limpio,
                         "NOMBRE": fila.get("NOMBRE", "").upper(),
                         "EDAD": fila.get("EDAD", ""),
@@ -352,7 +401,7 @@ def buscar_paciente(id):
                         "SPO2": float(fila.get("SPO2", 0.0)),
                         "RGC": float(fila.get("RGC", 0.0)),
                         "CLASIFICACION": fila.get("CLASIFICACION", "0")
-                    }
+                    })
     except Exception as e:
         print(f"Error al buscar paciente: {e}")
 
@@ -360,6 +409,7 @@ def buscar_paciente(id):
 
 def buscar_paciente_por_apellido(apellido):
     apellido_limpio = apellido.strip().upper()
+    salida_p = "pacientes_2025.csv"
 
     try:
         with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
@@ -413,7 +463,8 @@ def buscar_paciente_por_apellido(apellido):
 
 
 #PUNTO 4: Reporte y Visualizacion 
-def reporte_general(salida_p):
+def reporte_general(FILE):
+        salida_p = FILE
         try:
             with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
                 reader = csv.DictReader(archivo)
@@ -472,7 +523,8 @@ def reporte_general(salida_p):
             return None
 
 #FUNCIONES EXTRAS
-def pacientes_criticos(salida_p):
+def pacientes_criticos(FILE):
+    salida_p = FILE
     try:
         with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
             reader = csv.DictReader(archivo) #crea un objeto que toma la primera fila del archivo CSV como los nombres de las columnas
@@ -507,7 +559,8 @@ def pacientes_criticos(salida_p):
     
     return
 
-def calcular_imc_general(salida_p):
+def calcular_imc_general(FILE):
+    salida_p = FILE
     try:
         with open(salida_p, "r", encoding="utf-8-sig") as archivo:
             reader = csv.DictReader(archivo)
@@ -533,7 +586,8 @@ def calcular_imc_general(salida_p):
         print(f"Error al calcular IMC general: {e}")
         return None
     
-def promedio_edad(salida_p):
+def promedio_edad(FILE):
+    salida_p = FILE
     try:
         with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
             reader = csv.DictReader(archivo) #DictReader transforma cada fila en un diccionario
@@ -563,7 +617,8 @@ def promedio_edad(salida_p):
         print(f"Error al calcular el promedio de edad: {e}")
         return None
     
-def extremos_f_card():
+def extremos_f_card(FILE):
+    salida_p = FILE
     try:
         with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
                 reader = csv.DictReader(archivo)
@@ -620,77 +675,5 @@ def extremos_f_card():
     except Exception as e:
         print(f"Error al obtener extremos de F_CARD: {e}")
         return None
-#--MENU--
-def menu():
-    while True:
-        print("\n--- Menú---")
-        print("1. Buscar paciente")
-        print("2. Dar de baja/alta")
-        print("3. Gráficos")
-        print("4. Pacientes en estado crítico") #mostrar a los de rojo (críticos)
-        print("5. Promedio general de IMC") 
-        print("6. Promedio de edad de los pacientes")
-        print("7. ")
-        print("8. Salir")
-        opcion = input("Seleccione una opción: ")
-        match opcion:
-            case 1:
-                print("a.Buscar por apellido")
-                print("b.Buscar por ID")
-                minimenu1()
-            case 2:
-                print("a.Dar de baja ID")
-                print("b.Dar de alta")
-                minimenu2()
-            case 3:
-                print("a.Gráfico clasificacion de triage")
-                print("b.Gráfico de ECG")
-                print("c.Gráfico de IMC vs. PAM")
-                minimenu3()
-            case 4:
-                pacientes_criticos()
-            case 5:
-                promedio_imc_general ()
-            case 6:
-                print("hola")
-            case 7:
-                print("hola")
-            case 8:
-                print("Saliendo del programa.")
-                break # Sale del bucle while
-            case _:
-                print("Opción no válida.")
-def minimenu1 ():
-    sub_op=input("Seleccione una subopcion: ")
-    if sub_op == "a":
-        apellido=input("Ingrese el apellido del paciente que busca")
-        buscar_paciente_por_apellido(apellido)    
-    elif sub_op == "b":
-        id=input("Ingrese el ID del paciente que busca")
-        buscar_paciente(id)
-    else:
-        print("Sub-opción inválida.")
-def minimenu2 ():
-    sub_op=input("Seleccione una subopcion: ")
-    if sub_op == "a":
-        id=input("Ingrese el ID del paciente que desea eliminar")
-        eliminar_paciente(id, salida_p)
-    elif sub_op == "b":
-        dar_alta_paciente(salida_p)
-    else:
-        print("Sub-opción inválida.")
-def minimenu3 ():
-    sub_op=input("Seleccione una subopcion: ")
-    if sub_op == "a":
-        print("hola")
-        #fun
-    elif sub_op == "b":
-        gr.graficar_lineas_senyales(salida_p, entrada_s)
-    elif sub_op== "c":
-        grafico_dispersion()
-    else:
-        print("Sub-opción inválida.")
-        grafico_dispersion()
-    else:
-        print("Sub-opción inválida.")
+
 
