@@ -1,11 +1,16 @@
-import MENU as m
+import menu as m
 import FUNCIONES as eu
-entrada_p = "pacientes_final.csv"
-salida_p = "pacientes-2025.cvs"
+import time
 
-def main():
+entrada_p="pacientes_final.csv"
+eu.sumar_info_pacientes(entrada_p)
+
+while True:
+    #eu.sumar_info_pacientes(entrada_p)
     print("---SISTEMA DE PACIENTES---")
-    eu.sumar_info_pacientes(entrada_p)
-    while True:
-        if m.volver_al_menu():
-                m.menu()
+    time.sleep(0.5)
+    print("Iniciando programa...")
+    time.sleep(0.5)
+    if m.volver_al_menu():
+        m.menu()
+    else: break
