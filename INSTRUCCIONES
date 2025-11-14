@@ -1,72 +1,9 @@
-trabajo practico final: TRIAGE HOSPITALARIO
-
-LIBRERIAS:
-import numpy as np
-import matplotlib.pyplot as plt
-
-MANEJO DE ERRORES: TRY EXCEPT 
-es una estructura que permite intentar ejecutar 
-código (try) y capturar errores si ocurren (except), 
-evitando que el programa se rompa.
-
-INSTRUCCIONES:
-manejar errores con formato q queramos
-GENERAR: REPORTE datos+valores+clasificación
-GRAFICAR: grafico de barras \[cantidad de pacientes x clasificacion]
-GRAFICAR: para 1 paciente su ECG
-GRAFICAR: scatter plot imcXpam punto-color de triage
-TODO A DISPOCISION EN MENU
-MENU:
--reporte
-+filtrar por: clasificacion
--graf1
--graf2
--graf3
--buscar por apellido o id (imprime datos del paciente)
--dar de alta pacientes
--dar de baja pacientes
-+ borrar: pacientes que... 
-
-DICCIONARIO DE PACIENTES:
- ID
- NOMBRE
- EDAD
- --		PESO (KG)
- --		ALTURA (M)
- --		SISTOLICA (MMHG)
- --		DIASTOLICA (MMHG)
-TEMPERATURA (C)
-F CARD (LPM)
-NIVEL OXIGENO (PERC)
- --		GLUCOSA (MG/DL)
- -- 	COLESTEROL (MG/DL)
- --	 PULSOXIMETRO (LUZ ROJA R)
- --	 PULSOXIMETRO (LUZ INFRAROJA IR)
-
-TO DO:
-FUNCION calcular_valores(paciente)
-[¡AGREGAR CALCULOS AL ID PACIENTE!]
- IMC= peso y altura
- PAM= diastolica y sistolica
- SpO2= oximetria r e ir
- RGC= glucosa y colesterol
--------------------------
-FUNCION leer_ecg()
-ecg del paciente
-RETORNE
-valor max y min de la señal
-promedio de la señal
--------------------------
-FUNCIÓN triage_pacientes()
--ARGUMENTO : diccionario de un paciente
--RETORNE: clasificacion
-
- condiciones para el return:
-f card y presion arterial = 0 -- NEGRO
-temperatura>39,5 o nivel de oxigeno <85%, o pam entre 60 y 120 -- ROJO
-temperatura entre 38,5 y 39,5
-	f card entre 50 y 120, n de oxigeno entre 85 y 92, imc >40 --NARANJ
-temperatura entre 37,5 y 38,5,
-                       glucosa >180, colesterol >240 mg/dl --AMARILLO
-			                             	RGC>1	  imc entre 25 y 30--VERDE
-ELSE --- AZUL
+incomp	filtrar antes de guardar : que filtre siempre
+incomp	imc 
+incomp	que no se corte el flujo
+incomp	volver menu s, si, SI
+incomp	"que no se cierre todo el programa" : estetico (q no vuelva a foja 0)
+incomp	diastolica y sistolica
+incomp	comentarios
+incomp	archivos bien abiertos?
+incomp	try except que estan de mas
