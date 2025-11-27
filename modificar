@@ -1,9 +1,9 @@
-incomp	filtrar antes de guardar : que filtre siempre
+✅		filtrar antes de guardar : que filtre siempre
 incomp	imc 
 incomp	que no se corte el flujo
 incomp	volver menu s, si, SI
 incomp	"que no se cierre todo el programa" : estetico (q no vuelva a foja 0)
 󠁾✅	diastolica y sistolica
-incomp	comentarios
+✅	comentarios
 incomp	archivos bien abiertos?
-incomp	try except que estan de mas
+✅	try except que estan de mas
