@@ -54,6 +54,7 @@ def leer_pacientes(file):
                 escribir_archivo(salida_p,pacientes)
         return pacientes
         #y corrijo errores en el ingreso de archivos (pending....)
+
 def escribir_archivo(file, lista):  #nuevito
     pacientes = lista  
     with open(file, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
@@ -177,7 +178,6 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         else:    
             paciente["SPO2"] = oxim 
         
-
         
         #rgc = glu/col
         glucosa = paciente["GLUCOSA"]
@@ -188,7 +188,7 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
     return
 
 def sumar_info_pacientes(file):
-    file= "pacientes_final.csv"
+    #file= "pacientes_final.csv"
     pacientes = leer_pacientes(file)
     calcular_valores(pacientes)
     for paciente in pacientes:
@@ -222,18 +222,176 @@ def dar_alta_paciente(salida_p):
     # Obtener datos del nuevo paciente
     nombre = input("Ingresa el nombre y apellido del nuevo paciente: ")
     # salida_p [eval(linea.strip()) for linea in lineas]input("Ingrese
-    edad = int(input("Ingrese edad: "))
-    peso = float(input("Ingrese peso (Kg): "))
-    altura = float(input("Ingrese altura (m): "))
-    sistolica = input("Ingrese sistolica (MMHG): ")
-    diastolica = input("Ingrese diastolica (MMHG): ")
-    temperatura =input("Ingrese temperatura (°c): ")
-    f_card = input("Ingrese frecuencia cardiaca: ")
-    n_oxigeno = input("Ingrese nivel de oxigeno: ")
-    glucosa = input("Ingrese glucosa: ")  
-    colesterol = input("Ingrese colesterol: ")
-    pulsoximetro_r = input("Ingrese pulsoximetro rojo: ")             
-    pulsoximetro_ir = input("Ingrese pulsoximetro infrarrojo: ")                 
+    while True:
+        try:
+            edad = int(input("Ingrese edad: "))
+        except ValueError:  
+            continue  
+        if(edad>=0 and edad<120):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+        
+    while True:
+        try:
+            peso = float(input("Ingrese peso (Kg): "))
+        except ValueError:
+            continue
+        if(peso>=0 and peso<500):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+        
+    while True:
+        try:
+            altura = float(input("Ingrese altura (m): "))
+        except ValueError:
+            continue
+        if(altura>=0 and altura<500):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+         
+    while True:
+        try:
+            sistolica = int(input("Ingrese sistolica (MMHG): "))
+            diastolica = int(input("Ingrese diastolica (MMHG): "))
+        except ValueError:  
+            continue  
+        if(sistolica>diastolica):
+            break
+        else:
+            print("Los datos ingresados son invalidos, vuelve a ingresar.")
+            continue
+    
+    while True:
+        try:
+            temperatura = float(input("Ingrese temperatura (°c): "))
+        except ValueError:
+            continue
+        if(temperatura<50 and temperatura>27):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+        
+    while True:
+        try:
+            f_card = float(input("Ingrese temperatura (°c): "))
+        except ValueError:
+            continue
+        if(f_card<500 and temperatura>27):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+    
+    while True:
+        try:
+            n_oxigeno = float(input("Ingrese nivel de oxigeno: "))
+        except ValueError:
+            continue
+        if(n_oxigeno>50 and n_oxigeno<100):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+    
+    while True:
+        try:
+            glucosa = float(input("Ingrese glucosa: ")) 
+        except ValueError:
+            continue
+        if(glucosa>0 and glucosa<900):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+     
+    while True:
+        try:
+            colesterol = int(input("Ingrese colesterol: "))
+        except ValueError:
+            continue
+        if(colesterol>0 and colesterol<500):
+            break
+        else:
+            print("El dato ingresado es invalido, vuelve a ingresar.")
+            continue
+        
+    while True:
+        try:
+            pulsoximetro_r = int(input("Ingrese pulsoximetro rojo: ")  )           
+            pulsoximetro_ir = int(input("Ingrese pulsoximetro infrarrojo: "))
+        except ValueError:  
+            continue  
+        if(pulsoximetro_r>0 and pulsoximetro_ir>0):
+            break
+        else:
+            print("Los datos ingresados son invalidos, vuelve a ingresar.")
+            continue
+    #calc imc
+    imc = calcular_imc(peso, altura)
+    if(imc<16 or imc>200):
+        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar") #cambiar mensajitous  
+        while True:
+            try:
+                peso = float(input("Ingrese peso (Kg): "))
+            except ValueError:
+                continue
+            if(peso>=0 and peso<500):
+                break
+            else:
+                print("El dato ingresado es invalido, vuelve a ingresar.")
+                continue
+        
+        while True:
+            try:
+                altura = float(input("Ingrese altura (m): "))
+            except ValueError:
+                continue
+            if(altura>=0 and altura<500):
+                break
+            else:
+                print("El dato ingresado es invalido, vuelve a ingresar.")
+                continue
+            
+    pam = calcular_pres_am(diastolica, sistolica)
+    if(pam<20 or pam>200):
+        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")   
+        while True:
+            try:
+                sistolica = int(input("Ingrese sistolica (MMHG): "))
+                diastolica = int(input("Ingrese diastolica (MMHG): "))
+            except ValueError:  
+                continue  
+            if(sistolica>diastolica):
+                break
+            else:
+                print("Los datos ingresados son invalidos, vuelve a ingresar.")
+                continue
+            
+    oxim = calcular_porcentaje_R_IR(pulsoximetro_r, pulsoximetro_ir)
+    if(oxim<50 or oxim>100):
+        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")
+        while True:
+            try:
+                pulsoximetro_r = input("Ingrese pulsoximetro rojo: ")             
+                pulsoximetro_ir = input("Ingrese pulsoximetro infrarrojo: ")
+            except ValueError:  
+                continue  
+            if(pulsoximetro_r>0 and pulsoximetro_ir>0):
+                break
+            else:
+                print("Los datos ingresados son invalidos, vuelve a ingresar.")
+                continue 
+        
+    rgc = calcular_relacion_gc(glucosa, colesterol)
+
+                         
     # Crear el nuevo registro y agregarlo
     nuevo_paciente = {
         "ID": generar_id(salida_p),
@@ -249,19 +407,28 @@ def dar_alta_paciente(salida_p):
         "GLUCOSA": glucosa,
         "COLESTEROL": colesterol,
         "PULSOXIMETRO_R": pulsoximetro_r,
-        "PULSOXIMETRO_IR": pulsoximetro_ir}
+        "PULSOXIMETRO_IR": pulsoximetro_ir,
+        "IMC":imc,
+        "PAM":pam,
+        "SPO2":oxim,
+        "RGC":rgc}
     pacientes.append(nuevo_paciente)
-
+        
+    
     # Escribir la lista actualizada de nuevo en el archivo
     salida_p = "pacientes_2025.csv"
     escribir_archivo(salida_p, pacientes)####
     print("Paciente dado de alta exitosamente.")
+    return
+    
 def escribir_archivo(ruta, lista):
     with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
         writer.writeheader()
         writer.writerows(lista)
-            #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
+        #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
+    return
+
 def generar_id(file):
     pacientes = archivos_aux(file)
 
@@ -276,16 +443,13 @@ def generar_id(file):
     return new
 
 def triage_paciente (id):
-    try:
-        fc = float(id.get("F_CARD", 0) or 0)
-        pam = float(id.get("PAM", 0) or 0)
-        temp = float(id.get("TEMPERATURA", 0) or 0)
-        oxi = float(id.get("N_OXIGENO", 0) or 0)
-        imc = float(id.get("IMC", 0) or 0)
-        glu = float(id.get("GLUCOSA", 0) or 0)
-        col = float(id.get("COLESTEROL", 0) or 0)
-    except AttributeError:
-        return "Error"
+    fc = float(id.get("F_CARD", 0) or 0)
+    pam = float(id.get("PAM", 0) or 0)
+    temp = float(id.get("TEMPERATURA", 0) or 0)
+    oxi = float(id.get("N_OXIGENO", 0) or 0)
+    imc = float(id.get("IMC", 0) or 0)
+    glu = float(id.get("GLUCOSA", 0) or 0)
+    col = float(id.get("COLESTEROL", 0) or 0)
 
     # Clasifico por prioridad descendente
     criterios = [
@@ -309,6 +473,7 @@ def triage_paciente (id):
             return color
 
     return "Azul"
+
 def eliminar_paciente(id, file):
     filas_filtradas = []
     pacientes_eliminados = []
@@ -327,6 +492,7 @@ def eliminar_paciente(id, file):
         writer.writerows(pacientes_eliminados)
     salida_p = "pacientes_2025.csv"
     escribir_archivo(salida_p, filas_filtradas)####
+    print("\nEl paciente ha sido eliminado, debido a errores invalidos")
         
     return
     
@@ -353,21 +519,21 @@ def abrir_archivos(ruta):
             return np.array([float(x.strip()) for x in f.readlines()])
 
 def ecg_senyales(entrada_s):
-    max_señales = []
-    min_señales = []
-    prom_señales = []
+    max_senyales = []
+    min_senyales = []
+    prom_senyales = []
 
     datos = acceder_ecg(entrada_s)
     for dato in datos:
         ruta = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", dato)
-        señales = abrir_archivos(ruta)
-        #señales = acceder_ecg(entrada_s)
-        max_señales.append({"archivo": dato, "max": float(señales.max())})
-        min_señales.append({"archivo": dato, "min": float(señales.min())})
-        prom_señales.append({"archivo": dato, "promedio": sum(datos)/len(datos)})
+        senyales = abrir_archivos(ruta)
+        #senyales = acceder_ecg(entrada_s)
+        max_senyales.append({"archivo": dato, "max": float(senyales.max())})
+        min_senyales.append({"archivo": dato, "min": float(senyales.min())})
+        prom_senyales.append({"archivo": dato, "promedio": sum(datos)/len(datos)})
             #uso funciones integradas
             #ahora tengo un diccionario con los valores maximos y minimos relacionado al key de archivo 
-    return max_señales, min_señales, prom_señales
+    return max_senyales, min_senyales, prom_senyales
 
 def buscar_paciente(id):
     salida_p = "pacientes_2025.csv"
@@ -453,7 +619,7 @@ def buscar_paciente_por_apellido(apellido):
                         print(f"{clave}: {valor}")
 
                 except (ValueError, IndexError):
-                    print("Selección inválida.")
+                    print("Seleccion invalida.")
             return
 
     except Exception as e:
@@ -488,19 +654,19 @@ def reporte_general(FILE):
                     fcard = fila.get("F_CARD", "")
                     pr = fila.get("PULSOXIMETRO_R", "")
                     pir = fila.get("PULSOXIMETRO_IR", "")
-                    try:
-                        peso = float(peso)
-                        altura = float(altura)
-                        sist = float(sist)
-                        diast = float(diast)
-                        pr = float(pr)
-                        pir = float(pir)
-                        gluc = float(gluc)
-                        col = float(col)
-                        oxi = float(oxi)
-                        temp = float(temp)
-                    except:
-                        continue
+                    #try:
+                    peso = float(peso)
+                    altura = float(altura)
+                    sist = float(sist)
+                    diast = float(diast)
+                    pr = float(pr)
+                    pir = float(pir)
+                    gluc = float(gluc)
+                    col = float(col)
+                    oxi = float(oxi)
+                    temp = float(temp)
+                    #except:
+                        #continue
                     imc = calcular_imc(peso, altura)
                     pam = calcular_pres_am(diast, sist)
                     spo2 = calcular_porcentaje_R_IR(pr, pir)
@@ -514,8 +680,8 @@ def reporte_general(FILE):
                     print("Edad:", edad)
                     print("IMC:", imc)
                     print("PAM:", pam)
-                    print("Saturación O2:", spo2)
-                    print("Relación Glucosa/Colesterol:", rgc)
+                    print("Saturacion O2:", spo2)
+                    print("Relacion Glucosa/Colesterol:", rgc)
                     print("Color del triage:", color)
                     print("-" * 80)
         except Exception as e:
