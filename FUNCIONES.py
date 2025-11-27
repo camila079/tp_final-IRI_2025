@@ -1,8 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import csv
 import os
-import GRAFICOS as gr
 
 #PUNTO 1: LECTURA Y PROCESAMIENTO
 #escribo los nombres de mis csv aca arriba por si quiero cambiar el archivo que le doy o el nombre del nuevo
@@ -24,39 +22,57 @@ keysdeclinicas = [
 pacientes = [] #guardo los pecientes en una lista
 
 #abro el archivo para leerlo y guardar lo necesario
-def leer_pacientes(file):
-        with open(file, "r", encoding="utf-8-sig", newline="") as p:
-            reader = csv.DictReader(p)
+import csv
 
-            for fila in reader:
-                id_paciente = fila["paciente_id"]
-                paciente = {"ID": id_paciente,
-                            "NOMBRE": fila["nombre_paciente"].upper(),
-                            "EDAD": fila["edad"],
-                            "PESO": fila["peso_kg"],
-                            "ALTURA": fila["altura_m"],
-                            "SISTOLICA": fila["sistolica_mmHg"],
-                            "DIASTOLICA": fila["diastolica_mmHg"],
-                            "TEMPERATURA": fila["temperatura_C"],
-                            "F_CARD": fila["frecuencia_cardiaca_lpm"],
-                            "N_OXIGENO": fila["nivel_oxigeno_perc"],
-                            "GLUCOSA": fila["glucosa_mg_dL"],
-                            "COLESTEROL": fila["colesterol_mg_dL"],
-                            "PULSOXIMETRO_R": fila["pulsoximetro_r_perc"],
-                            "PULSOXIMETRO_IR": fila["pulsoximetro_ir_perc"],
-                            "IMC": 0.0,                         
-                            "PAM": 0, 
-                            "SPO2": 0, 
-                            "RGC": 0,
-                            "CLASIFICACION": 0
-                            }
-                pacientes.append(paciente)
-                escribir_archivo(salida_p,pacientes)
-        return pacientes
-        #y corrijo errores en el ingreso de archivos (pending....)
+def leer_pacientes(file, salida_p):
+    pacientes = []
+    ids_guardados = set()   #evita duplicados y no tiene orden
 
-def escribir_archivo(file, lista):  #nuevito
-    pacientes = lista  
+    with open(file, "r", encoding="utf-8-sig", newline="") as p:
+        reader = csv.DictReader(p)
+
+        for fila in reader:
+            id_paciente = fila["paciente_id"]
+
+            # si el ID ya existe, generar uno nuevo
+            if id_paciente in ids_guardados:
+                lista_ids = [p["ID"] for p in pacientes if p["ID"].startswith("P") and p["ID"][1:].isdigit()]
+                numeros = [int(i[1:]) for i in lista_ids]
+                nuevo_numero = max(numeros) + 1 if numeros else 1
+                id_paciente = f"P{nuevo_numero:04d}"
+            else:
+                ids_guardados.add(id_paciente)
+
+            paciente = {
+                "ID": id_paciente,
+                "NOMBRE": fila["nombre_paciente"].upper(),
+                "EDAD": fila["edad"],
+                "PESO": fila["peso_kg"],
+                "ALTURA": fila["altura_m"],
+                "SISTOLICA": fila["sistolica_mmHg"],
+                "DIASTOLICA": fila["diastolica_mmHg"],
+                "TEMPERATURA": fila["temperatura_C"],
+                "F_CARD": fila["frecuencia_cardiaca_lpm"],
+                "N_OXIGENO": fila["nivel_oxigeno_perc"],
+                "GLUCOSA": fila["glucosa_mg_dL"],
+                "COLESTEROL": fila["colesterol_mg_dL"],
+                "PULSOXIMETRO_R": fila["pulsoximetro_r_perc"],
+                "PULSOXIMETRO_IR": fila["pulsoximetro_ir_perc"],
+                "IMC": 0.0,
+                "PAM": 0,
+                "SPO2": 0,
+                "RGC": 0,
+                "CLASIFICACION": 0
+            }
+
+            pacientes.append(paciente)
+        pacientes = escribir_archivo(salida_p, pacientes)
+
+    return pacientes
+
+def escribir_archivo(file, lista): 
+    pacientes = lista
+    pacientes_validos = []  
     with open(file, "w", encoding="utf-8-sig", newline="") as archivo: #archivo q escribo
         writer = csv.DictWriter(archivo, fieldnames=keysdeclinicas)
         writer.writeheader()
@@ -70,38 +86,39 @@ def escribir_archivo(file, lista):  #nuevito
             #int
             paciente["N_OXIGENO"] = round(int(paciente["N_OXIGENO"]))
             paciente["EDAD"] = round(int(paciente["EDAD"]))
-            paciente["GLUCOSA"] = round(int(paciente["N_OXIGENO"]))
+            paciente["GLUCOSA"] = round(int(paciente["GLUCOSA"]))
             paciente["COLESTEROL"] = round(int(paciente["COLESTEROL"]))
-            writer.writerows(pacientes)
+            paciente["F_CARD"] = round(int(paciente["F_CARD"]))
+            
             
             #Manejo de errores
+            
             if(paciente["EDAD"]<0):
-                id_e = paciente["ID"]
-                eliminar_paciente(id_e, file)
+                continue
                 
             if(paciente["TEMPERATURA"]>50 or paciente["TEMPERATURA"]<27):
-                id_t = paciente["ID"]
-                eliminar_paciente(id_t, file)
+                continue
             
             if(paciente["F_CARD"]<27 or paciente["F_CARD"]>500):
-                id_f = paciente["ID"]
-                eliminar_paciente(id_f, file)
+                continue
             
             if(paciente["COLESTEROL"]<0 or paciente["COLESTEROL"]>500):
-                id_c = paciente["ID"]
-                eliminar_paciente(id_c, file)
+                continue
                 
             if(paciente["GLUCOSA"]<0 or paciente["GLUCOSA"]>900):
-                id_g = paciente["ID"]
-                eliminar_paciente(id_g, file)  
-    return pacientes
+                continue 
+            
+            pacientes_validos.append(paciente) 
+        writer.writerows(pacientes_validos)    
+    return pacientes_validos
 
+#le pasas la lista para q reescriba
 def sobrescribir_archivo(ruta, lista):
     with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
         writer.writeheader()
         writer.writerows(lista)
-
+#CALCULOS
 def calcular_porcentaje_R_IR(percent_r, percent_ir):
     porcentaje_r_ir = 0.0
     sum_r_ir = percent_r + percent_ir
@@ -130,12 +147,10 @@ def calcular_relacion_gc(gluc, colest):
         gc = -1 #le asigno un valor para indicar que el valor es incorrecto
     else: 
         gc = float(gluc)/float(colest)
-    
     return gc
-
+#calculos resumido:
 def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del paciente
     file="pacientes_2025.csv"
-    #longitud_datos = len(pacientedatos)
     imc = 0.0 #Indice de masa corporal    
     pam = 0.0 #Presion arterial media
     oxim = 0.0 #Indice de SpO2
@@ -166,7 +181,6 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         else:    
             paciente["PAM"] = pam 
         
-
         #oximetria = 100*(IF/(R+IF))
         porcentaje_roja= float(paciente["PULSOXIMETRO_R"])
         porcentaje_infrarroja= float(paciente["PULSOXIMETRO_IR"])
@@ -178,7 +192,6 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         else:    
             paciente["SPO2"] = oxim 
         
-        
         #rgc = glu/col
         glucosa = paciente["GLUCOSA"]
         colesterol = int(paciente["COLESTEROL"])
@@ -188,15 +201,14 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
     return
 
 def sumar_info_pacientes(file):
-    #file= "pacientes_final.csv"
-    pacientes = leer_pacientes(file)
+    pacientes = leer_pacientes(file,salida_p)
     calcular_valores(pacientes)
     for paciente in pacientes:
         paciente["CLASIFICACION"] = triage_paciente(paciente)
 
-    sobrescribir_archivo("pacientes_2025.csv", pacientes)
+    sobrescribir_archivo(salida_p, pacientes)
 
-def archivos_aux(ruta):
+def archivos_aux(ruta): #datos para graficar
     with open(ruta, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         pacientes = []
@@ -217,10 +229,7 @@ def archivos_aux(ruta):
     return pacientes
 
 def dar_alta_paciente(salida_p):
-    # Obtener datos del nuevo paciente verificando que se ingresen datos validos
-    # Leer pacientes existentes
-    # pacientes = leer_pacientes(entrada_p)
-   
+    # Obtener datos del nuevo paciente verificando que se ingresen datos validos   
     nombre = input("Ingresa el nombre y apellido del nuevo paciente: ")
     #edad
     while True:
@@ -335,13 +344,16 @@ def dar_alta_paciente(salida_p):
             print("Los datos ingresados son invalidos, vuelve a ingresar.")
             continue
     #calc imc ·······································
+    
     imc = calcular_imc(peso, altura)
     i=0
     if(imc<16 or imc>200):
         i=-1
     while i==-1:
+        imc = calcular_imc(peso, altura)
         print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")
         if(imc<16 or imc>200):
+            i=-1
             while True:
                 try:
                     peso = float(input("Ingrese peso (Kg): "))
@@ -396,9 +408,8 @@ def dar_alta_paciente(salida_p):
                 continue 
         
     rgc = calcular_relacion_gc(glucosa, colesterol)
-
-                         
-    # Crear el nuevo registro y agregarlo
+    
+    # Ya puedo guardar el registro para agregar
     nuevo_paciente = {
         "ID": generar_id(salida_p),
         "NOMBRE": nombre,
@@ -417,45 +428,37 @@ def dar_alta_paciente(salida_p):
         "IMC":imc,
         "PAM":pam,
         "SPO2":oxim,
-        "RGC":rgc}
+        "RGC":rgc,
+        "CLASIFICACION": 0}
+    
+    nuevo_paciente["CLASIFICACION"] = triage_paciente(nuevo_paciente["ID"])
     pacientes.append(nuevo_paciente)
         
-    
     # Escribir la lista actualizada de nuevo en el archivo
     salida_p = "pacientes_2025.csv"
     escribir_archivo(salida_p, pacientes)####
     print("Paciente dado de alta exitosamente.")
     return
     
-def escribir_archivo(ruta, lista):
-    with open(ruta, 'w', encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=keysdeclinicas)
-        writer.writeheader()
-        writer.writerows(lista)
-        #escribe el contenido de la variable paciente en un archivo, asegurándose de que cada paciente quede en una línea separada
-    return
-
 def generar_id(file):
     pacientes = archivos_aux(file)
-
     lista_ids = [p["id_paciente"] for p in pacientes]
-
+    
     numeros = [int(i[1:]) for i in lista_ids if i.startswith("P") and i[1:].isdigit()]
-    
+
     nuevo_numero = max(numeros) + 1 if numeros else 1
-    
     new=f"P{nuevo_numero:04d}"
 
     return new
 
 def triage_paciente (id):
-    fc = float(id.get("F_CARD", 0) or 0)
-    pam = float(id.get("PAM", 0) or 0)
-    temp = float(id.get("TEMPERATURA", 0) or 0)
-    oxi = float(id.get("N_OXIGENO", 0) or 0)
-    imc = float(id.get("IMC", 0) or 0)
-    glu = float(id.get("GLUCOSA", 0) or 0)
-    col = float(id.get("COLESTEROL", 0) or 0)
+    fc = float(id.get("F_CARD", 0))
+    pam = float(id.get("PAM", 0))
+    temp = float(id.get("TEMPERATURA", 0))
+    oxi = float(id.get("N_OXIGENO", 0))
+    imc = float(id.get("IMC", 0))
+    glu = float(id.get("GLUCOSA", 0))
+    col = float(id.get("COLESTEROL", 0))
 
     # Clasifico por prioridad descendente
     criterios = [
@@ -483,21 +486,31 @@ def triage_paciente (id):
 def eliminar_paciente(id, file):
     filas_filtradas = []
     pacientes_eliminados = []
+    while True:
+        if id.startswith("P") and id[1:].isdigit():
+            id_clean = int(id[1:])
+            break
+        else:
+            print("Ingrese un valor valido")
+            id = input("Ingrese el ID del paciente a eliminar (solo DÍGITOS): ")
+            continue
+
     with open(file, "r", encoding="utf-8-sig") as archivo:
                 reader = csv.DictReader(archivo)
                 fieldnames = reader.fieldnames
                 for fila in reader:
-                    if fila["ID"] != id:
+                    if str(fila.get("ID", "")).strip() != id_clean:
                         filas_filtradas.append(fila)
                     else:
                         pacientes_eliminados.append(fila)
                         
     with open("pacientes_eliminados", "w", encoding="utf-8-sig", newline="") as archivo:
         writer = csv.DictWriter(archivo, fieldnames=fieldnames)
-        writer.writeheader
+        writer.writeheader()
         writer.writerows(pacientes_eliminados)
-    salida_p = "pacientes_2025.csv"
-    escribir_archivo(salida_p, filas_filtradas)####
+
+    sobrescribir_archivo(salida_p, filas_filtradas)####
+    
     print("\nEl paciente ha sido eliminado, debido a errores invalidos")
         
     return
@@ -516,7 +529,7 @@ def acceder_ecg(entrada_s):
             
     except Exception as e: #no se pudo abrir el archivo ya esta
         print(f"Error en la lectura de archivos ECG: {e}")
-        return None, None
+        return None
     
     return datos
 
@@ -618,7 +631,16 @@ def buscar_paciente_por_apellido(apellido):
                 print(f"Hay {contador} pacientes con este apellido")
                 for i in range(contador):
                     print(f"{i}.{resultados[i]['ID']}, {resultados[i]['NOMBRE']}")
-                seleccion = int(input("Ingrese el numero de quien busca"))
+                while True:
+                    try:
+                        seleccion = int(input("Ingrese el numero de quien busca: "))
+                    except ValueError:
+                        continue
+                    if(seleccion<contador and seleccion>=0):
+                        break
+                    else:
+                        print("El numero ingresado es invalido")
+                        continue
                 try:
                     paciente_elegido = resultados[seleccion]
                     for clave, valor in paciente_elegido.items():
@@ -626,7 +648,13 @@ def buscar_paciente_por_apellido(apellido):
 
                 except (ValueError, IndexError):
                     print("Seleccion invalida.")
-            return
+            
+                return
+            else:
+                for clave, valor in resultados[0].items():
+                        print(f"{clave}: {valor}")
+                
+                return
 
     except Exception as e:
         print(f"Error al buscar paciente por apellido: {e}")
@@ -637,8 +665,7 @@ def buscar_paciente_por_apellido(apellido):
 #PUNTO 4: Reporte y Visualizacion 
 def reporte_general(FILE):
         salida_p = FILE
-        try:
-            with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
+        with open(salida_p, mode="r", encoding="utf-8-sig") as archivo:
                 reader = csv.DictReader(archivo)
                 print("\n---REPORTE DE PACIENTES---")
                 print("-"*80)
@@ -649,38 +676,11 @@ def reporte_general(FILE):
                     #saco los datos del diccionario
                     nombre = fila.get("NOMBRE", "")
                     edad = fila.get("EDAD", "")
-                    peso = fila.get("PESO", "")
-                    altura = fila.get("ALTURA", "")
-                    sist = fila.get("SISTOLICA", "")
-                    diast = fila.get("DIASTOLICA", "")
-                    temp = fila.get("TEMPERATURA", "")
-                    oxi = fila.get("N_OXIGENO", "")
-                    gluc = fila.get("GLUCOSA", "")
-                    col = fila.get("COLESTEROL", "")
-                    fcard = fila.get("F_CARD", "")
-                    pr = fila.get("PULSOXIMETRO_R", "")
-                    pir = fila.get("PULSOXIMETRO_IR", "")
-                    #try:
-                    peso = float(peso)
-                    altura = float(altura)
-                    sist = float(sist)
-                    diast = float(diast)
-                    pr = float(pr)
-                    pir = float(pir)
-                    gluc = float(gluc)
-                    col = float(col)
-                    oxi = float(oxi)
-                    temp = float(temp)
-                    #except:
-                        #continue
-                    imc = calcular_imc(peso, altura)
-                    pam = calcular_pres_am(diast, sist)
-                    spo2 = calcular_porcentaje_R_IR(pr, pir)
-                    rgc = calcular_relacion_gc(gluc, col)
-                    #diccionario con valores para el triage
-                    p = {"F_CARD" : fcard, "PAM" : pam, "TEMPERATURA" : temp, "N_OXIGENO" : oxi, 
-                        "IMC" : imc, "GLUCOSA" : gluc, "COLESTEROL" : col}
-                    color = triage_paciente(p)
+                    imc = fila.get("IMC", "")
+                    pam = fila.get("PAM", "")
+                    spo2 = fila.get("SPO2", "")
+                    rgc = fila.get("RGC", "")
+                    color = fila.get("CLASIFICACION", "")
 
                     print("Nombre:", nombre)
                     print("Edad:", edad)
@@ -690,9 +690,6 @@ def reporte_general(FILE):
                     print("Relacion Glucosa/Colesterol:", rgc)
                     print("Color del triage:", color)
                     print("-" * 80)
-        except Exception as e:
-            print(f"Error al generar el reporte: {e}")
-            return None
 
 #FUNCIONES EXTRAS
 def pacientes_criticos(FILE):
@@ -847,5 +844,4 @@ def extremos_f_card(FILE):
     except Exception as e:
         print(f"Error al obtener extremos de F_CARD: {e}")
         return None
-
 
