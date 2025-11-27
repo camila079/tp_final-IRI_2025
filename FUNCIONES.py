@@ -217,11 +217,12 @@ def archivos_aux(ruta):
     return pacientes
 
 def dar_alta_paciente(salida_p):
+    # Obtener datos del nuevo paciente verificando que se ingresen datos validos
     # Leer pacientes existentes
     # pacientes = leer_pacientes(entrada_p)
-    # Obtener datos del nuevo paciente
+   
     nombre = input("Ingresa el nombre y apellido del nuevo paciente: ")
-    # salida_p [eval(linea.strip()) for linea in lineas]input("Ingrese
+    #edad
     while True:
         try:
             edad = int(input("Ingrese edad: "))
@@ -232,7 +233,7 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-        
+    #peso
     while True:
         try:
             peso = float(input("Ingrese peso (Kg): "))
@@ -243,18 +244,18 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-        
+    #altura
     while True:
         try:
-            altura = float(input("Ingrese altura (m): "))
+            altura = float(input("Ingrese altura (m ej:1.8): "))
         except ValueError:
             continue
-        if(altura>=0 and altura<500):
+        if(altura>=0 and altura<5):
             break
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-         
+    #pam
     while True:
         try:
             sistolica = int(input("Ingrese sistolica (MMHG): "))
@@ -266,7 +267,7 @@ def dar_alta_paciente(salida_p):
         else:
             print("Los datos ingresados son invalidos, vuelve a ingresar.")
             continue
-    
+    #temperatura
     while True:
         try:
             temperatura = float(input("Ingrese temperatura (°c): "))
@@ -277,18 +278,18 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-        
+    #frecuencia cardiaca
     while True:
         try:
-            f_card = float(input("Ingrese temperatura (°c): "))
+            f_card = float(input("Ingrese frecuencia cardiaca: "))
         except ValueError:
             continue
-        if(f_card<500 and temperatura>27):
+        if(f_card<200 and f_card>30):
             break
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-    
+    #oxigeno
     while True:
         try:
             n_oxigeno = float(input("Ingrese nivel de oxigeno: "))
@@ -299,7 +300,7 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-    
+    #glucosa
     while True:
         try:
             glucosa = float(input("Ingrese glucosa: ")) 
@@ -310,7 +311,7 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-     
+    #colesterol
     while True:
         try:
             colesterol = int(input("Ingrese colesterol: "))
@@ -321,7 +322,7 @@ def dar_alta_paciente(salida_p):
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
             continue
-        
+    #oximetria
     while True:
         try:
             pulsoximetro_r = int(input("Ingrese pulsoximetro rojo: ")  )           
@@ -333,35 +334,40 @@ def dar_alta_paciente(salida_p):
         else:
             print("Los datos ingresados son invalidos, vuelve a ingresar.")
             continue
-    #calc imc
+    #calc imc ·······································
     imc = calcular_imc(peso, altura)
+    i=0
     if(imc<16 or imc>200):
-        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar") #cambiar mensajitous  
-        while True:
-            try:
-                peso = float(input("Ingrese peso (Kg): "))
-            except ValueError:
-                continue
-            if(peso>=0 and peso<500):
-                break
-            else:
-                print("El dato ingresado es invalido, vuelve a ingresar.")
-                continue
-        
-        while True:
-            try:
-                altura = float(input("Ingrese altura (m): "))
-            except ValueError:
-                continue
-            if(altura>=0 and altura<500):
-                break
-            else:
-                print("El dato ingresado es invalido, vuelve a ingresar.")
-                continue
+        i=-1
+    while i==-1:
+        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")
+        if(imc<16 or imc>200):
+            while True:
+                try:
+                    peso = float(input("Ingrese peso (Kg): "))
+                except ValueError:
+                    continue
+                if(peso>=0 and peso<500):
+                    break
+                else:
+                    print("El dato ingresado es invalido, vuelve a ingresar.")
+                    continue
+            
+            while True:
+                try:
+                    altura = float(input("Ingrese altura (m): "))
+                except ValueError:
+                    continue
+                if(altura>=0 and altura<500):
+                    break
+                else:
+                    print("El dato ingresado es invalido, vuelve a ingresar.")
+                    continue
+        else: i=0
             
     pam = calcular_pres_am(diastolica, sistolica)
     if(pam<20 or pam>200):
-        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")   
+        print("Alguno de los valores (diastolica o sistolica) ingresado es incorrecto, vuelva a ingresar")   
         while True:
             try:
                 sistolica = int(input("Ingrese sistolica (MMHG): "))
@@ -376,7 +382,7 @@ def dar_alta_paciente(salida_p):
             
     oxim = calcular_porcentaje_R_IR(pulsoximetro_r, pulsoximetro_ir)
     if(oxim<50 or oxim>100):
-        print("Alguno de los valores (peso o altura) ingresado es incorrecto, vuelva a ingresar")
+        print("Alguno de los valores (pulsoximetros) ingresado es incorrecto, vuelva a ingresar")
         while True:
             try:
                 pulsoximetro_r = input("Ingrese pulsoximetro rojo: ")             
