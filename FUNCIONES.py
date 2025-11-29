@@ -99,7 +99,7 @@ def escribir_archivo(file, lista):
             if(paciente["TEMPERATURA"]>50 or paciente["TEMPERATURA"]<27):
                 continue
             
-            if(paciente["F_CARD"]<27 or paciente["F_CARD"]>500):
+            if(paciente["F_CARD"]<0 or paciente["F_CARD"]>500):
                 continue
             
             if(paciente["COLESTEROL"]<0 or paciente["COLESTEROL"]>500):
@@ -175,7 +175,7 @@ def calcular_valores(pacientedatos): #calcula el imc y etc y le das el dic del p
         pres_diastolica = paciente["DIASTOLICA"]
         pres_sistolica = paciente["SISTOLICA"]
         pam = calcular_pres_am(pres_diastolica, pres_sistolica)
-        if(pam<20 or pam>200):
+        if(pam<0 or pam>200):
             id_e = paciente["ID"]
             eliminar_paciente(id_e, file)
         else:    
@@ -293,7 +293,7 @@ def dar_alta_paciente(salida_p):
             f_card = float(input("Ingrese frecuencia cardiaca: "))
         except ValueError:
             continue
-        if(f_card<200 and f_card>30):
+        if(f_card<200 and f_card>=0):
             break
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
@@ -304,7 +304,7 @@ def dar_alta_paciente(salida_p):
             n_oxigeno = float(input("Ingrese nivel de oxigeno: "))
         except ValueError:
             continue
-        if(n_oxigeno>50 and n_oxigeno<100):
+        if(n_oxigeno>=0 and n_oxigeno<100):
             break
         else:
             print("El dato ingresado es invalido, vuelve a ingresar.")
@@ -338,7 +338,7 @@ def dar_alta_paciente(salida_p):
             pulsoximetro_ir = int(input("Ingrese pulsoximetro infrarrojo: "))
         except ValueError:  
             continue  
-        if(pulsoximetro_r>0 and pulsoximetro_ir>0):
+        if(pulsoximetro_r>=0 and pulsoximetro_ir>=0):
             break
         else:
             print("Los datos ingresados son invalidos, vuelve a ingresar.")
@@ -431,7 +431,7 @@ def dar_alta_paciente(salida_p):
         "RGC":rgc,
         "CLASIFICACION": 0}
     
-    nuevo_paciente["CLASIFICACION"] = triage_paciente(nuevo_paciente["ID"])
+    nuevo_paciente["CLASIFICACION"] = triage_paciente(nuevo_paciente)#
     pacientes.append(nuevo_paciente)
         
     # Escribir la lista actualizada de nuevo en el archivo
@@ -544,7 +544,7 @@ def ecg_senyales(entrada_s):
 
     datos = acceder_ecg(entrada_s)
     for dato in datos:
-        ruta = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\ecg_signals", dato)
+        ruta = os.path.join(r"C:\Users\camila\OneDrive\Documents\proyectos\TP_FINAL\ecg_signals", dato)
         senyales = abrir_archivos(ruta)
         #senyales = acceder_ecg(entrada_s)
         max_senyales.append({"archivo": dato, "max": float(senyales.max())})
